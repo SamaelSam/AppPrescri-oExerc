@@ -3,7 +3,6 @@ from typing import Optional
 from datetime import date
 
 class Patient(BaseModel):
-    id: Optional[str] = Field(None, alias="_id")
     name: str = Field(..., min_length=3, max_length=100)
     age: int = Field(..., gt=0, le=120)
     weight: float = Field(..., gt=0)

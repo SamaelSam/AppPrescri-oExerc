@@ -1,11 +1,26 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from app.models.exercise import Exercise
+from app.services.exercise_service import (
+    get_all_exercises, 
+    create_exercise, 
+    get_exercise_by_id, 
+    delete_exercise
+)
 
-router = APIRouter(prefix="/exercises", tags=["Exercises"])
+router = APIRouter()
 
-exercises = []
+@router.get("/exercises/")
+async def list_exercises():
+    return await get_all_exercises()
 
-@router.post("/", response_model=Exercise)
-async def create_exercise(exercise: Exercise):
-    exercises.append(exercise)
-    return exercise
+@router.post("/exercises/")
+async def add_exercise(exercise: Exercise):
+    return await create_exercise(exercise)
+
+@router.get("/exercises/{exercise_id}")
+async def get_exercise(exercise_id: str):
+    return await get_exercise_by_id(exercise_id)
+
+@router.delete("/exercises/{exercise_id}")
+async def remove_exercise(exercise_id: str):
+    return await delete_exercise(exercise_id)
