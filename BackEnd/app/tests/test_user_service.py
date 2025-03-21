@@ -3,55 +3,60 @@ from app.services.user_service import create_user, get_user_by_username, verify_
 from app.models.user import User
 
 @pytest.mark.asyncio
-async def test_create_user(test_db, monkeypatch):
-    """
-    Testa a criação de usuário com banco de dados de teste.
-    """
+async def test_create_user(monkeypatch, test_db):
+    # Mock do insert_one
+    async def mock_insert_one(data):
+        class MockInsertResult:
+            inserted_id = "fake_id"
+        return MockInsertResult()
 
-    # 1. Mock de get_collection para usar test_db
-    from app.services import user_service
-    def mock_get_collection(name: str):
-        return test_db[name]
-    monkeypatch.setattr(user_service, "get_collection", mock_get_collection)
+    monkeypatch.setattr(test_db["users"], "insert_one", mock_insert_one)
 
-    # 2. Cria um objeto Pydantic de usuário
-    user_obj = User(
-        username="test_user",
-        hashed_password="testpassword",
-        email="test_user@example.com"
-    )
+    # Dados para o modelo
+    user_data = {
+        "username": "test_user",
+        "email": "test@example.com",
+        "password": "mypassword",   # texto puro
+        "role": "user"
+    }
+    # Converte em objeto Pydantic
+    user_obj = User(**user_data)
 
-    # 3. Chama a função de criação de usuário
-    result = await user_service.create_user(user_obj)
+    # Chama a função create_user
+    result = await create_user(user_obj)
 
-    # 4. Verifica o retorno
-    assert "username" in result
+    # Verifica se o dicionário salvo no banco tem hashed_password
+    assert "hashed_password" in result
+    # Verifica se não é igual à senha pura
+    assert result["hashed_password"] != "mypassword"
+    # Garante que o hash corresponde à senha
+    assert verify_password("mypassword", result["hashed_password"])
+    # Verifica username e role
     assert result["username"] == "test_user"
-    assert "_id" in result
-
+    assert result["role"] == "user"
+    
 @pytest.mark.asyncio
-async def test_get_user_by_username(test_db, monkeypatch):
-    """
-    Testa a busca de usuário por nome de usuário.
-    """
+async def test_get_user_by_username(monkeypatch, test_db):
+    # Mock do find_one
+    async def mock_find_one(query):
+        if query["username"] == "test_user":
+            return {
+                "_id": "fake_id",
+                "username": "test_user",
+                "email": "test@example.com",
+                "hashed_password": "somehashed",
+                "role": "user"
+            }
+        return None
 
-    from app.services import user_service
-    def mock_get_collection(name: str):
-        return test_db[name]
-    monkeypatch.setattr(user_service, "get_collection", mock_get_collection)
+    monkeypatch.setattr(test_db["users"], "find_one", mock_find_one)
 
-    # Cria um usuário no banco de teste
-    user_obj = User(
-        username="sample_user",
-        hashed_password="samplepassword",
-        email="sample_user@example.com"
-    )
-    await user_service.create_user(user_obj)
+    from app.services.user_service import get_user_by_username
 
-    # Busca pelo username
-    found_user = await user_service.get_user_by_username("sample_user")
-    assert found_user is not None
-    assert found_user["username"] == "sample_user"
+    user = await get_user_by_username("test_user")
+    assert user is not None
+    assert user["username"] == "test_user"
+    assert verify_password("mypassword", user["hashed_password"])
 
 @pytest.mark.asyncio
 async def test_verify_password():

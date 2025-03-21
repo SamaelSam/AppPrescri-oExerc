@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from bson import ObjectId
 from app.db.connection import get_collection
 from app.models.user import User
+from app.utils.security import hash_password, verify_password
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 collection = get_collection("users")
@@ -14,20 +15,29 @@ async def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 async def create_user(user: User) -> dict:
-    user_data = user.dict()
-    user_data["hashed_password"] = get_password_hash(user_data["hashed_password"])
-    result = await collection.insert_one(user_data)
-    return {
-        "username": user_data["username"],
-        "_id": str(result.inserted_id)
-    }
+    """
+    Recebe um objeto User (com password em texto puro).
+    Gera hash e salva como hashed_password no banco.
+    """
+    doc = user.dict()  # {'username': ..., 'email': ..., 'password': 'texto', 'role': 'user'}
+    
+    # Transformar o password em hashed_password
+    hashed = hash_password(doc["password"])
+    doc["hashed_password"] = hashed
+    # Opcional: remover o 'password' do dicionário
+    doc.pop("password")
+
+    collection = get_collection("users")
+    result = await collection.insert_one(doc)
+    doc["_id"] = str(result.inserted_id)
+    return doc
 
 async def get_user_by_username(username: str) -> dict | None:
+    collection = get_collection("users")
     user = await collection.find_one({"username": username})
     if user:
         user["_id"] = str(user["_id"])
-        return user
-    return None
+    return user
 
 async def get_all_users() -> list:
     users = await collection.find().to_list(100)
