@@ -3,6 +3,6 @@ from typing import Optional
 
 class Exercise(BaseModel):
     name: str
-    description: str
-    category: str
-    difficulty: Optional[str] = "medium"
+    description: Optional[str] = None
+    category: Optional[str] = None
+    difficulty: str = "medium"

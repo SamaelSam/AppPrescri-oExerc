@@ -1,29 +1,32 @@
+from typing import List, Optional
+from pymongo.collection import Collection
 from bson import ObjectId
-from fastapi import HTTPException
-from app.db.connection import get_collection
 from app.models.schedule import Schedule
 
-collection = get_collection("schedules")
+def get_collection() -> Collection:
+    # Função para obter a coleção do MongoDB
+    from db import get_database
+    db = get_database()
+    return db["schedules"]
 
-async def get_all_schedules():
-    schedules = await collection.find().to_list(100)
-    for schedule in schedules:
-        schedule["_id"] = str(schedule["_id"])
-    return schedules
+async def create_schedule(schedule: Schedule) -> dict:
+    collection = get_collection()
+    schedule_dict = schedule.dict(by_alias=True, exclude={"id"})
+    result = await collection.insert_one(schedule_dict)
+    schedule_dict["_id"] = str(result.inserted_id)
+    return schedule_dict
 
-async def create_schedule(schedule: Schedule):
-    result = await collection.insert_one(schedule.dict())
-    return {"id": str(result.inserted_id)}
-
-async def get_schedule_by_id(schedule_id: str):
+async def get_schedule_by_id(schedule_id: str) -> Optional[dict]:
+    collection = get_collection()
     schedule = await collection.find_one({"_id": ObjectId(schedule_id)})
     if schedule:
         schedule["_id"] = str(schedule["_id"])
-        return schedule
-    raise HTTPException(status_code=404, detail="Agenda não encontrada")
+    return schedule
 
-async def delete_schedule(schedule_id: str):
+async def delete_schedule(schedule_id: str) -> dict:
+    collection = get_collection()
     result = await collection.delete_one({"_id": ObjectId(schedule_id)})
-    if result.deleted_count == 1:
-        return {"message": "Agenda removida com sucesso"}
-    raise HTTPException(status_code=404, detail="Agenda não encontrada")
+    if result.deleted_count:
+        return {"message": "Agendamento removido com sucesso"}
+    else:
+        return {"message": "Agendamento não encontrado"}

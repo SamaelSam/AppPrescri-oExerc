@@ -1,9 +1,11 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
 from datetime import datetime
+from typing import Optional
 
 class Schedule(BaseModel):
-    patient_id: str
+    id: Optional[str] = Field(None, alias="_id")
+    user_id: str
     exercise_id: str
-    date: datetime
+    scheduled_time: datetime
+    duration_minutes: int
     notes: Optional[str] = None

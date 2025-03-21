@@ -1,8 +1,7 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, EmailStr
 
 class User(BaseModel):
     username: str
-    email: str
-    password: str
-    role: Optional[str] = "user"
+    hashed_password: str
+    email: EmailStr
+
