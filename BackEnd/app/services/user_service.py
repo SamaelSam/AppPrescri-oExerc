@@ -28,3 +28,22 @@ async def get_user_by_username(username: str) -> dict | None:
         user["_id"] = str(user["_id"])
         return user
     return None
+
+async def get_all_users() -> list:
+    users = await collection.find().to_list(100)
+    for user in users:
+        user["_id"] = str(user["_id"])
+    return users
+
+async def get_user_by_id(user_id: str) -> dict:
+    user = await collection.find_one({"_id": ObjectId(user_id)})
+    if user:
+        user["_id"] = str(user["_id"])
+        return user
+    raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+async def delete_user(user_id: str) -> dict:
+    result = await collection.delete_one({"_id": ObjectId(user_id)})
+    if result.deleted_count == 1:
+        return {"message": "Usuário removido com sucesso"}
+    raise HTTPException(status_code=404, detail="Usuário não encontrado")
