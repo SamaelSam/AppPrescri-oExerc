@@ -1,29 +1,30 @@
-from bson import ObjectId
-from fastapi import HTTPException
-from app.db.connection import get_collection
+from typing import List, Optional
 from app.models.patient import Patient
+from bson import ObjectId
 
-collection = get_collection("patients")
+# Supondo que get_collection seja uma função que retorna a coleção do MongoDB
+def get_collection(name: str):
+    # Implementação para obter a coleção do MongoDB
+    pass
 
-async def get_all_patients():
-    patients = await collection.find().to_list(100)
-    for patient in patients:
-        patient["_id"] = str(patient["_id"])
-    return patients
+async def create_patient(patient_data: dict) -> dict:
+    collection = get_collection("patients")
+    patient = Patient(**patient_data)
+    result = await collection.insert_one(patient.dict(by_alias=True))
+    return {**patient.dict(by_alias=True), "_id": result.inserted_id}
 
-async def create_patient(patient: Patient):
-    result = await collection.insert_one(patient.dict())
-    return {"id": str(result.inserted_id)}
+async def get_patient_by_id(patient_id: ObjectId) -> Optional[dict]:
+    collection = get_collection("patients")
+    patient = await collection.find_one({"_id": patient_id})
+    return patient
 
-async def get_patient_by_id(patient_id: str):
-    patient = await collection.find_one({"_id": ObjectId(patient_id)})
-    if patient:
-        patient["_id"] = str(patient["_id"])
-        return patient
-    raise HTTPException(status_code=404, detail="Paciente não encontrado")
+async def update_patient(patient_id: ObjectId, update_data: dict) -> Optional[dict]:
+    collection = get_collection("patients")
+    await collection.update_one({"_id": patient_id}, {"$set": update_data})
+    updated_patient = await collection.find_one({"_id": patient_id})
+    return updated_patient
 
-async def delete_patient(patient_id: str):
-    result = await collection.delete_one({"_id": ObjectId(patient_id)})
-    if result.deleted_count == 1:
-        return {"message": "Paciente removido com sucesso"}
-    raise HTTPException(status_code=404, detail="Paciente não encontrado")
+async def delete_patient(patient_id: ObjectId) -> bool:
+    collection = get_collection("patients")
+    result = await collection.delete_one({"_id": patient_id})
+    return result.deleted_count == 1

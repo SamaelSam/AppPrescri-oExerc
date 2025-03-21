@@ -8,3 +8,5 @@ motor
 python-dotenv
 passlib
 bcrypt
+python-jose
+python-multipart

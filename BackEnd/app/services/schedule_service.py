@@ -30,9 +30,3 @@ async def delete_schedule(schedule_id: str) -> dict:
         return {"message": "Agendamento removido com sucesso"}
     else:
         return {"message": "Agendamento não encontrado"}
-    
-async def get_all_schedules():
-    schedules = await collection.find().to_list(100)
-    for schedule in schedules:
-        schedule["_id"] = str(schedule["_id"])
-    return schedules
