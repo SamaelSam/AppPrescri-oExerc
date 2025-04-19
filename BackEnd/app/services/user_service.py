@@ -19,12 +19,9 @@ async def create_user(user: User) -> dict:
     Recebe um objeto User (com password em texto puro).
     Gera hash e salva como hashed_password no banco.
     """
-    doc = user.dict()  # {'username': ..., 'email': ..., 'password': 'texto', 'role': 'user'}
-    
-    # Transformar o password em hashed_password
+    doc = user.dict()
     hashed = hash_password(doc["password"])
     doc["hashed_password"] = hashed
-    # Opcional: remover o 'password' do dicionário
     doc.pop("password")
 
     collection = get_collection("users")
@@ -35,6 +32,17 @@ async def create_user(user: User) -> dict:
 async def get_user_by_username(username: str) -> dict | None:
     collection = get_collection("users")
     user = await collection.find_one({"username": username})
+    if user:
+        user["_id"] = str(user["_id"])
+    return user
+
+async def get_user_by_email(email: str) -> dict | None:
+    """
+    Busca um usuário pelo email.
+    Retorna None se não encontrar.
+    """
+    collection = get_collection("users")
+    user = await collection.find_one({"email": email})
     if user:
         user["_id"] = str(user["_id"])
     return user

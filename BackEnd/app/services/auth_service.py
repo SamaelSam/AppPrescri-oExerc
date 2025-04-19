@@ -1,27 +1,30 @@
 from datetime import datetime, timedelta
-from jose import jwt
-from app.utils.security import hash_password, verify_password
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 from app.models.user import User, Role
-from app.db.connection import get_collection
 
-SECRET_KEY = "seu_segredo_super_secreto"
+# Chave secreta para gerar e verificar tokens (guarde em um .env depois)
+SECRET_KEY = "sua_chave_secreta_super_segura"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-async def register_user(user: User):
-    collection = get_collection("users")
-    user.password = hash_password(user.password)
-    await collection.insert_one(user.dict())
-
-async def authenticate_user(username: str, password: str):
-    collection = get_collection("users")
-    user = await collection.find_one({"username": username})
-    if not user or not verify_password(password, user["password"]):
-        return False
-    return user
+def decode_access_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        return None
