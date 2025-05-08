@@ -14,7 +14,7 @@ class AuthController extends GetxController {
     try {
       final AuthToken auth = await _repo.login(email, password);
       token.value = auth;
-      Get.offAllNamed(AppRoutes.schedules);
+      Get.offAllNamed(AppRoutes.scheduleList);
     } catch (e) {
       Get.snackbar(
         'Erro de login',

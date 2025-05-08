@@ -8,6 +8,7 @@ class ExerciseFormPage extends StatelessWidget {
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController videoUrlController = TextEditingController();
 
   ExerciseFormPage({super.key});
 
@@ -33,14 +34,22 @@ class ExerciseFormPage extends StatelessWidget {
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Campo obrigatório' : null,
               ),
+              TextFormField(
+                controller: videoUrlController,
+                decoration: const InputDecoration(labelText: 'URL do vídeo (opcional)'),
+              ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    controller.createExercise(
+                    controller.addExercise(
                       nameController.text,
                       descriptionController.text,
+                      videoUrlController.text.isEmpty
+                          ? null
+                          : videoUrlController.text,
                     );
+                    Get.back(); // volta para a lista após salvar
                   }
                 },
                 child: const Text('Salvar'),

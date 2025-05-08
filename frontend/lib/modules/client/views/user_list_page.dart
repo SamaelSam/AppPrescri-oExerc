@@ -5,17 +5,25 @@ import '../controllers/user_controller.dart';
 import '../models/user_model.dart';
 
 class UserListPage extends StatelessWidget {
-  final UserController controller = Get.put(UserController());
+  final UserController controller = Get.put(UserController());  // Garantir que o controller seja instanciado aqui
+
+  UserListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // A primeira execução de fetchUsers ocorre no onInit do controller.
     controller.fetchUsers();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Usuários')),
       body: Obx(() {
-        if (controller.users.isEmpty) {
+        // Verifica se o controlador está carregando ou se não há usuários
+        if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.users.isEmpty) {
+          return const Center(child: Text('Nenhum usuário encontrado.'));
         }
 
         return ListView.builder(
@@ -30,14 +38,13 @@ class UserListPage extends StatelessWidget {
                 onPressed: () {
                   Get.defaultDialog(
                     title: 'Confirmar exclusão',
-                    middleText:
-                        'Tem certeza que deseja excluir o usuário ${user.username}?',
+                    middleText: 'Tem certeza que deseja excluir o usuário ${user.username}?',
                     textCancel: 'Cancelar',
                     textConfirm: 'Excluir',
                     confirmTextColor: Colors.white,
                     onConfirm: () {
-                      controller.deleteUser(user.id ?? '');
-                      Get.back();
+                      controller.deleteUser(user.id);  // Corrigido para usar o id diretamente
+                      Get.back();  // Fecha o dialog
                     },
                   );
                 },

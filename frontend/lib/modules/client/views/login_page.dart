@@ -7,29 +7,34 @@ class LoginPage extends StatelessWidget {
   final passwordController = TextEditingController();
   final auth = Get.find<AuthController>();
 
+  LoginPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Login")),
+      appBar: AppBar(title: const Text("Login")),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: "E-mail"),
+              decoration: const InputDecoration(labelText: "E-mail"),
             ),
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: "Senha"),
+              decoration: const InputDecoration(labelText: "Senha"),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                auth.login(emailController.text, passwordController.text);
+                auth.login(
+                  emailController.text.trim(),
+                  passwordController.text,
+                );
               },
-              child: Text("Entrar"),
+              child: const Text("Entrar"),
             )
           ],
         ),

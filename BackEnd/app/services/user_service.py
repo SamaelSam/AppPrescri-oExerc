@@ -1,18 +1,23 @@
 from passlib.context import CryptContext
 from fastapi import HTTPException
 from bson import ObjectId
-from app.db.connection import get_collection
+from app.database import get_collection
 from app.models.user import User
 from app.utils.security import hash_password, verify_password
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-collection = get_collection("users")
+collection = get_collection("fitness_app.users")
 
-def get_password_hash(password: str) -> str:
+def create_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-async def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
+
+# Função para testar o hash da senha
+def test_password_hashing(password: str) -> bool:
+    hashed_password = create_password_hash(password)
+    return verify_password(password, hashed_password)
 
 async def create_user(user: User) -> dict:
     """
@@ -23,6 +28,10 @@ async def create_user(user: User) -> dict:
     hashed = hash_password(doc["password"])
     doc["hashed_password"] = hashed
     doc.pop("password")
+
+    # Testando se o hash funciona corretamente
+    if not test_password_hashing(doc["password"]):
+        raise HTTPException(status_code=500, detail="Erro ao criar o hash da senha")
 
     collection = get_collection("users")
     result = await collection.insert_one(doc)
@@ -41,7 +50,7 @@ async def get_user_by_email(email: str) -> dict | None:
     Busca um usuário pelo email.
     Retorna None se não encontrar.
     """
-    collection = get_collection("users")
+    collection = get_collection("fitness_app.users")
     user = await collection.find_one({"email": email})
     if user:
         user["_id"] = str(user["_id"])

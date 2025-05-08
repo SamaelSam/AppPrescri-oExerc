@@ -6,7 +6,6 @@ class ExerciseController extends GetxController {
   final ExerciseRepository _repo = ExerciseRepository();
 
   final RxList<ExerciseModel> exercises = <ExerciseModel>[].obs;
-
   final RxBool isLoading = false.obs;
 
   @override
@@ -27,10 +26,12 @@ class ExerciseController extends GetxController {
     }
   }
 
-  Future<void> addExercise(
-      String name, String description, String? videoUrl) async {
-    final newExercise =
-        ExerciseModel(name: name, description: description, videoUrl: videoUrl);
+  Future<void> addExercise(String name, String description, String? videoUrl) async {
+    final newExercise = ExerciseModel(
+      name: name,
+      description: description,
+      videoUrl: videoUrl,
+    );
     try {
       await _repo.create(newExercise);
       fetchExercises();

@@ -9,6 +9,11 @@ def get_collection() -> Collection:
     db = get_database()
     return db["schedules"]
 
+async def get_all_schedules():
+    collection = get_collection("schedules")
+    schedules = await collection.find().to_list(length=1000)
+    return schedules
+
 async def create_schedule(schedule: Schedule) -> dict:
     collection = get_collection()
     schedule_dict = schedule.dict(by_alias=True, exclude={"id"})

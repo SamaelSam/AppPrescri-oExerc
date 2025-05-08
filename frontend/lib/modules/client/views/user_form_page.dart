@@ -42,18 +42,39 @@ class UserFormPage extends StatelessWidget {
                     value == null || value.isEmpty ? 'Campo obrigatório' : null,
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    controller.createUser(
-                      usernameController.text,
-                      emailController.text,
-                      passwordController.text,
-                    );
-                  }
-                },
-                child: const Text('Salvar'),
-              ),
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return const CircularProgressIndicator();
+                }
+                return ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      // Chama o método createUser do UserController
+                      await controller.createUser(
+                        usernameController.text,
+                        emailController.text,
+                        passwordController.text,
+                      );
+                      // Exibe a mensagem de erro, caso ocorra
+                      if (controller.errorMessage.isNotEmpty) {
+                        // Exibe uma snackbar com a mensagem de erro
+                        Get.snackbar('Erro', controller.errorMessage.value,
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white);
+                      } else {
+                        // Limpa os campos após salvar
+                        usernameController.clear();
+                        emailController.clear();
+                        passwordController.clear();
+                        // Volta para a tela anterior
+                        Get.back();
+                      }
+                    }
+                  },
+                  child: const Text('Salvar'),
+                );
+              }),
             ],
           ),
         ),

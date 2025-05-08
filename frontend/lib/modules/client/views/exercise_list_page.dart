@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/exercise_controller.dart';
+import '../../../routes/app_pages.dart'; // ajuste conforme estrutura
 
 class ExerciseListPage extends StatelessWidget {
   final ExerciseController controller = Get.find<ExerciseController>();
 
+  ExerciseListPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    // Garante que os dados sejam buscados ao abrir a tela
-    controller.fetchExercises();
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exercícios'),
+        title: const Text('Exercícios'),
       ),
       body: Obx(() {
-        // Caso você deseje exibir um carregando, adicione isLoading no controller
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         if (controller.exercises.isEmpty) {
-          return Center(child: Text('Nenhum exercício encontrado.'));
+          return const Center(child: Text('Nenhum exercício encontrado.'));
         }
 
         return ListView.builder(
@@ -26,10 +29,11 @@ class ExerciseListPage extends StatelessWidget {
             final e = controller.exercises[index];
             return ListTile(
               title: Text(e.name),
-              subtitle:
-                  Text('${e.category ?? 'Sem categoria'} • ${e.difficulty}'),
+              subtitle: Text(
+                '${e.category ?? 'Sem categoria'} • ${e.difficulty ?? 'Sem dificuldade'}',
+              ),
               trailing: IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () {
                   Get.defaultDialog(
                     title: 'Confirmar',
@@ -37,9 +41,10 @@ class ExerciseListPage extends StatelessWidget {
                     textConfirm: 'Sim',
                     textCancel: 'Não',
                     onConfirm: () async {
-                      await controller
-                          .deleteExercise(e.id!); // ou outro identificador
-                      Get.back();
+                      if (e.id != null) {
+                        await controller.deleteExercise(e.id!);
+                        Get.back();
+                      }
                     },
                   );
                 },
@@ -49,8 +54,8 @@ class ExerciseListPage extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed('/add-exercise'),
-        child: Icon(Icons.add),
+        onPressed: () => Get.toNamed(AppRoutes.exerciseForm),
+        child: const Icon(Icons.add),
       ),
     );
   }

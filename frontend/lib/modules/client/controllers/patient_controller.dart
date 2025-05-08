@@ -4,9 +4,7 @@ import 'package:frontend/modules/client/models/patient_model.dart';
 
 class PatientController extends GetxController {
   final PatientRepository _repo = PatientRepository();
-
   final RxList<PatientModel> patients = <PatientModel>[].obs;
-
   final RxBool isLoading = false.obs;
 
   @override
@@ -16,8 +14,8 @@ class PatientController extends GetxController {
   }
 
   Future<void> fetchPatients() async {
-    isLoading.value = true;
     try {
+      isLoading.value = true;
       final data = await _repo.getAll();
       patients.assignAll(data);
     } catch (e) {
@@ -27,20 +25,25 @@ class PatientController extends GetxController {
     }
   }
 
-  Future<void> addPatient(String name, String email, String phone) async {
-    final newPatient = PatientModel(name: name, email: email, phone: phone);
+  // Método para criar um paciente
+  Future<void> createPatient(String name, String email, String phone) async {
+    final newPatient = PatientModel(
+      name: name,
+      email: email,
+      phone: phone,
+    );
     try {
       await _repo.create(newPatient);
       fetchPatients();
     } catch (e) {
-      print('Erro ao adicionar paciente: $e');
+      print('Erro ao criar paciente: $e');
     }
   }
 
   Future<void> deletePatient(String id) async {
     try {
       await _repo.delete(id);
-      fetchPatients();
+      patients.removeWhere((p) => p.id == id);
     } catch (e) {
       print('Erro ao deletar paciente: $e');
     }

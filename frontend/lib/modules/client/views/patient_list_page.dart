@@ -5,15 +5,17 @@ import '../controllers/patient_controller.dart';
 class PatientListPage extends StatelessWidget {
   final PatientController controller = Get.find<PatientController>();
 
+  PatientListPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    controller.fetchPatients();
+    controller.fetchPatients(); // Garantir que os pacientes sejam carregados na tela
 
     return Scaffold(
-      appBar: AppBar(title: Text('Pacientes')),
+      appBar: AppBar(title: const Text('Pacientes')),
       body: Obx(() {
         if (controller.patients.isEmpty) {
-          return Center(child: Text('Nenhum paciente encontrado.'));
+          return const Center(child: Text('Nenhum paciente encontrado.'));
         }
 
         return ListView.builder(
@@ -22,9 +24,9 @@ class PatientListPage extends StatelessWidget {
             final p = controller.patients[index];
             return ListTile(
               title: Text(p.name),
-              subtitle: Text('${p.age} anos - ${p.email}'),
+              subtitle: Text(p.email), // Ajustado para exibir apenas o e-mail
               trailing: IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () {
                   Get.defaultDialog(
                     title: 'Confirmar',
@@ -32,8 +34,7 @@ class PatientListPage extends StatelessWidget {
                     textConfirm: 'Sim',
                     textCancel: 'Não',
                     onConfirm: () async {
-                      await controller
-                          .deletePatient(p.id!); // ou outro identificador
+                      await controller.deletePatient(p.id!); // ou outro identificador
                       Get.back();
                     },
                   );
@@ -45,7 +46,7 @@ class PatientListPage extends StatelessWidget {
       }),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.toNamed('/add-patient'),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

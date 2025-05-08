@@ -25,19 +25,15 @@ class ScheduleController extends GetxController {
     }
   }
 
-  Future<void> createSchedule({
-    required String patientId,
-    required String exerciseId,
-    required DateTime scheduledAt,
-  }) async {
+  Future<void> createSchedule(String patientId, String exerciseId, DateTime scheduledAt) async {
     try {
-      final newSchedule = ScheduleModel(
+      final schedule = ScheduleModel(
         patientId: patientId,
         exerciseId: exerciseId,
         scheduledAt: scheduledAt,
       );
-      await _repo.create(newSchedule);
-      fetchSchedules();
+      await _repo.create(schedule);
+      await fetchSchedules();
     } catch (e) {
       print('Erro ao criar agendamento: $e');
     }
