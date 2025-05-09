@@ -10,7 +10,6 @@ import '../modules/client/controllers/schedule_controller.dart';
 import '../modules/client/controllers/patient_controller.dart';
 import '../modules/client/controllers/exercise_controller.dart';
 import '../modules/client/controllers/user_controller.dart';
-import '../modules/client/controllers/auth_controller.dart';
 
 import '../middlewares/auth_middleware.dart';
 
@@ -27,9 +26,6 @@ final List<GetPage> appPages = [
   GetPage(
     name: AppRoutes.login,
     page: () => LoginPage(),
-    binding: BindingsBuilder(() {
-      Get.put(AuthController());
-    }),
   ),
   GetPage(
     name: AppRoutes.scheduleList,
@@ -37,7 +33,6 @@ final List<GetPage> appPages = [
     bindings: [
       BindingsBuilder(() {
         Get.put(ScheduleController());
-        Get.put(AuthController());
       }),
     ],
     middlewares: [AuthMiddleware()],
@@ -79,3 +74,4 @@ final List<GetPage> appPages = [
     middlewares: [AuthMiddleware()],
   ),
 ];
+

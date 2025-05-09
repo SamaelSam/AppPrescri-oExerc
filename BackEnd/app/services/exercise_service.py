@@ -1,9 +1,9 @@
 from fastapi import HTTPException
 from bson import ObjectId
-from app.db.connection import get_collection
+from app.database import get_collection
 from app.models.exercise import Exercise
 
-collection = get_collection("exercises")
+collection = get_collection("fitness_app.exercises")
 
 async def create_exercise(exercise: Exercise) -> dict:
     # Converte o objeto Pydantic em dicionário

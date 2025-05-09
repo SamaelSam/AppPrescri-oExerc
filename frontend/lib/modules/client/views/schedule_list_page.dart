@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/schedule_controller.dart'; // Importando o controlador de agendamentos
+import 'package:intl/intl.dart'; // Para formatação de data
 
 class ScheduleListPage extends StatelessWidget {
   final AuthController auth = Get.find();
-  final ScheduleController scheduleController = Get.find(); // Instanciando o controlador de agendamentos
+  final ScheduleController scheduleController =
+      Get.find(); // Instanciando o controlador de agendamentos
 
   ScheduleListPage({super.key});
 
@@ -46,11 +48,33 @@ class ScheduleListPage extends StatelessWidget {
           itemCount: scheduleController.schedules.length,
           itemBuilder: (_, index) {
             final schedule = scheduleController.schedules[index];
-            return ListTile(
-              title: Text(schedule.patientId), // Ajuste conforme o campo relevante
-              subtitle: Text('Exercício: ${schedule.exerciseId}'),
-              trailing: Text(schedule.scheduledAt.toString()), // Exibe a data do agendamento
-            );
+
+            // Formatar a data de agendamento
+            final formattedDate =
+                DateFormat('dd/MM/yyyy HH:mm').format(schedule.scheduledTime);
+
+            return Card(
+  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+  elevation: 2,
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  child: ListTile(
+    title: Text(
+      'Usuário: ${schedule.userId}',
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    ),
+    subtitle: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 4),
+        Text('Exercício: ${schedule.exerciseId}'),
+        Text('Notas: ${schedule.notes}'),
+        Text('Duração: ${schedule.durationMinutes} minutos'),
+        Text('Agendado para: ${schedule.scheduledTime.toLocal().toString()}'),
+      ],
+    ),
+  ),
+);
+
           },
         );
       }),

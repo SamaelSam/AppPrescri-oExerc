@@ -1,31 +1,39 @@
 class ScheduleModel {
   final String? id;
-  final String patientId;
+  final String userId;
   final String exerciseId;
-  final DateTime scheduledAt;
+  final DateTime scheduledTime;
+  final int durationMinutes;
+  final String notes;
 
   ScheduleModel({
     this.id,
-    required this.patientId,
+    required this.userId,
     required this.exerciseId,
-    required this.scheduledAt,
+    required this.scheduledTime,
+    required this.durationMinutes,
+    required this.notes,
   });
 
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
     return ScheduleModel(
-      id: json['id'],
-      patientId: json['patientId'],
-      exerciseId: json['exerciseId'],
-      scheduledAt: DateTime.parse(json['scheduledAt']),
+      id: json['_id'],
+      userId: json['user_id'],
+      exerciseId: json['exercise_id'],
+      scheduledTime: DateTime.parse(json['scheduled_time']),
+      durationMinutes: json['duration_minutes'],
+      notes: json['notes'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'patientId': patientId,
-      'exerciseId': exerciseId,
-      'scheduledAt': scheduledAt.toIso8601String(),
+      '_id': id,
+      'user_id': userId,
+      'exercise_id': exerciseId,
+      'scheduled_time': scheduledTime.toIso8601String(),
+      'duration_minutes': durationMinutes,
+      'notes': notes,
     };
   }
 }

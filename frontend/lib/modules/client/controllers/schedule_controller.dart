@@ -4,6 +4,7 @@ import 'package:frontend/modules/client/models/schedule_model.dart';
 
 class ScheduleController extends GetxController {
   final ScheduleRepository _repo = ScheduleRepository();
+
   final RxList<ScheduleModel> schedules = <ScheduleModel>[].obs;
   final RxBool isLoading = false.obs;
 
@@ -25,12 +26,20 @@ class ScheduleController extends GetxController {
     }
   }
 
-  Future<void> createSchedule(String patientId, String exerciseId, DateTime scheduledAt) async {
+  Future<void> createSchedule({
+    required String userId,
+    required String exerciseId,
+    required DateTime scheduledTime,
+    required int durationMinutes,
+    required String notes,
+  }) async {
     try {
       final schedule = ScheduleModel(
-        patientId: patientId,
+        userId: userId,
         exerciseId: exerciseId,
-        scheduledAt: scheduledAt,
+        scheduledTime: scheduledTime,
+        durationMinutes: durationMinutes,
+        notes: notes,
       );
       await _repo.create(schedule);
       await fetchSchedules();

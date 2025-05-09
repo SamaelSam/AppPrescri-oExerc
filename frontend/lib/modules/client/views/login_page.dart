@@ -5,7 +5,7 @@ import '../controllers/auth_controller.dart';
 class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final auth = Get.find<AuthController>();
+  final AuthController auth = Get.find<AuthController>(); // usa o existente
 
   LoginPage({super.key});
 
@@ -29,10 +29,9 @@ class LoginPage extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                auth.login(
-                  emailController.text.trim(),
-                  passwordController.text,
-                );
+                print("Botão pressionado");
+                print("Login iniciado: ${emailController.text}");
+                auth.login(emailController.text, passwordController.text);
               },
               child: const Text("Entrar"),
             )
