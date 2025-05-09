@@ -16,15 +16,26 @@ class ExerciseRepository {
     }
   }
 
-  Future<void> create(ExerciseModel exercise) async {
+  Future<ExerciseModel> create(ExerciseModel exercise) async {
+    final Map<String, dynamic> data = {
+      'id': exercise.id,
+      'name': exercise.name,
+      'description': exercise.description,
+      if (exercise.videoUrl != null) 'videoUrl': exercise.videoUrl,
+      if (exercise.difficulty != null) 'difficulty': exercise.difficulty,
+      if (exercise.category != null) 'category': exercise.category,
+    };
+
     final response = await http.post(
       Uri.parse('$baseUrl/exercises'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode(exercise.toJson()),
+      body: jsonEncode(data),
     );
 
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Falha ao criar exercício');
+    if (response.statusCode == 201) {
+      return ExerciseModel.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Erro ao criar exercício: ${response.body}');
     }
   }
 

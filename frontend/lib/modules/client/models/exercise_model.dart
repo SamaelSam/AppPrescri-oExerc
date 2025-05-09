@@ -18,7 +18,7 @@ class ExerciseModel {
   // Atualizando o método fromJson para incluir difficulty e category
   factory ExerciseModel.fromJson(Map<String, dynamic> json) {
     return ExerciseModel(
-      id: json['id'],
+      id: "ex123",
       name: json['name'],
       description: json['description'],
       videoUrl: json['videoUrl'],
@@ -29,13 +29,18 @@ class ExerciseModel {
 
   // Atualizando o método toJson para incluir difficulty e category
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'videoUrl': videoUrl,
-      'difficulty': difficulty, // Adicionado
-      'category': category,     // Adicionado
-    };
-  }
+  final data = {
+    'id': "ex123",
+    'name': name,
+    'description': description,
+    'videoUrl': videoUrl,
+    'difficulty': difficulty,
+    'category': category,
+  };
+
+  // Remove campos com valor null
+  data.removeWhere((key, value) => value == null);
+  return data;
+}
+
 }
