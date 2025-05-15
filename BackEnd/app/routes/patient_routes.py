@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.models.patient import Patient
+from fastapi.encoders import jsonable_encoder
 from app.services.patient_service import (
     get_all_patients, 
     create_patient, 
@@ -9,9 +10,12 @@ from app.services.patient_service import (
 
 router = APIRouter()
 
+
+
 @router.get("/patients/")
 async def list_patients():
-    return await get_all_patients()
+    patients = await get_all_patients()
+    return jsonable_encoder(patients)
 
 @router.post("/patients/")
 async def add_patient(patient: Patient):

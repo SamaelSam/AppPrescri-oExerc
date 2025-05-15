@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/modules/client/controllers/user_controller.dart';
+import '../controllers/user_controller.dart';
 
 class UserFormPage extends StatelessWidget {
   final UserController controller = Get.find();

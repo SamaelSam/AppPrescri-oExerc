@@ -18,11 +18,10 @@ class AuthController extends GetxController {
 
     final box = GetStorage();
     box.write('token', auth.accessToken); // ← salva o token
-
     print("Login bem-sucedido, token: ${auth.accessToken}");
     print("Token setado no controlador: ${token.value?.accessToken}");
 
-    Get.offAllNamed(AppRoutes.exerciseList); // ← redireciona
+    Get.offAllNamed(AppRoutes.userList); // ← redireciona
   } catch (e) {
     Get.snackbar(
       'Erro de login',

@@ -4,7 +4,7 @@ import 'package:frontend/modules/client/models/patient_model.dart';
 
 class PatientController extends GetxController {
   final PatientRepository _repo = PatientRepository();
-  final RxList<PatientModel> patients = <PatientModel>[].obs;
+  final RxList<Patient> patients = <Patient>[].obs;
   final RxBool isLoading = false.obs;
 
   @override
@@ -25,13 +25,26 @@ class PatientController extends GetxController {
     }
   }
 
-  // Método para criar um paciente
-  Future<void> createPatient(String name, String email, String phone) async {
-    final newPatient = PatientModel(
+  // Método atualizado para criar um paciente com todos os campos
+  Future<void> createPatient({
+    required String name,
+    required int age,
+    required double weight,
+    required double height,
+    required String medicalCondition,
+    required String email,
+    required String phone,
+  }) async {
+    final newPatient = Patient(
       name: name,
+      age: age,
+      weight: weight,
+      height: height,
+      medicalCondition: medicalCondition,
       email: email,
       phone: phone,
     );
+
     try {
       await _repo.create(newPatient);
       fetchPatients();

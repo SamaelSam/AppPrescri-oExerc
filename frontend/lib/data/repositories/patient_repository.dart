@@ -5,18 +5,18 @@ import '../../modules/client/models/patient_model.dart';
 class PatientRepository {
   final String baseUrl = 'http://localhost:8000';
 
-  Future<List<PatientModel>> getAll() async {
+  Future<List<Patient>> getAll() async {
     final response = await http.get(Uri.parse('$baseUrl/patients'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => PatientModel.fromJson(json)).toList();
+      return data.map((json) => Patient.fromJson(json)).toList();
     } else {
       throw Exception('Erro ao buscar pacientes');
     }
   }
 
-  Future<void> create(PatientModel patient) async {
+  Future<void> create(Patient patient) async {
     final response = await http.post(
       Uri.parse('$baseUrl/patients'),
       headers: {'Content-Type': 'application/json'},

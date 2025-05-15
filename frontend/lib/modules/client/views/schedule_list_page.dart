@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
-import '../controllers/schedule_controller.dart'; // Importando o controlador de agendamentos
-import 'package:intl/intl.dart'; // Para formatação de data
+import '../controllers/schedule_controller.dart';
+import 'package:intl/intl.dart';
+import '../../../routes/app_pages.dart'; // Certifique-se de que essa rota está correta
 
 class ScheduleListPage extends StatelessWidget {
   final AuthController auth = Get.find();
-  final ScheduleController scheduleController =
-      Get.find(); // Instanciando o controlador de agendamentos
+  final ScheduleController scheduleController = Get.find();
 
   ScheduleListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Carregar os agendamentos ao inicializar a página
     scheduleController.fetchSchedules();
 
     return Scaffold(
@@ -28,12 +27,10 @@ class ScheduleListPage extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        // Exibir um carregamento enquanto os dados estão sendo carregados
         if (scheduleController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // Verifica se a lista de agendamentos está vazia
         if (scheduleController.schedules.isEmpty) {
           return const Center(
             child: Text(
@@ -43,41 +40,43 @@ class ScheduleListPage extends StatelessWidget {
           );
         }
 
-        // Exibe a lista de agendamentos
         return ListView.builder(
           itemCount: scheduleController.schedules.length,
           itemBuilder: (_, index) {
             final schedule = scheduleController.schedules[index];
-
-            // Formatar a data de agendamento
             final formattedDate =
                 DateFormat('dd/MM/yyyy HH:mm').format(schedule.scheduledTime);
 
             return Card(
-  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-  elevation: 2,
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-  child: ListTile(
-    title: Text(
-      'Usuário: ${schedule.userId}',
-      style: const TextStyle(fontWeight: FontWeight.bold),
-    ),
-    subtitle: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 4),
-        Text('Exercício: ${schedule.exerciseId}'),
-        Text('Notas: ${schedule.notes}'),
-        Text('Duração: ${schedule.durationMinutes} minutos'),
-        Text('Agendado para: ${schedule.scheduledTime.toLocal().toString()}'),
-      ],
-    ),
-  ),
-);
-
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              child: ListTile(
+                title: Text(
+                  'Usuário: ${schedule.userId}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text('Exercício: ${schedule.exerciseId}'),
+                    Text('Notas: ${schedule.notes}'),
+                    Text('Duração: ${schedule.durationMinutes} minutos'),
+                    Text('Agendado para: $formattedDate'),
+                  ],
+                ),
+              ),
+            );
           },
         );
       }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.toNamed(AppRoutes.scheduleForm),
+        backgroundColor: Colors.blueAccent,
+        tooltip: 'Novo agendamento',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

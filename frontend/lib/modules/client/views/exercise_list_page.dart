@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/exercise_controller.dart';
+import '../controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
 
 class ExerciseListPage extends StatelessWidget {
   final ExerciseController controller = Get.find<ExerciseController>();
+  final AuthController auth = Get.find<AuthController>();
 
   ExerciseListPage({super.key});
 
@@ -14,6 +16,13 @@ class ExerciseListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Exercícios'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+            onPressed: () => auth.logout(),
+          ),
+        ],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {

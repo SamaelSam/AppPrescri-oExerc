@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import '../../../routes/app_pages.dart';
 import '../controllers/user_controller.dart';
 import '../models/user_model.dart';
 
 class UserListPage extends StatelessWidget {
-  final UserController controller = Get.put(UserController());  // Garantir que o controller seja instanciado aqui
+  final UserController controller = Get.put(
+      UserController()); // Garantir que o controller seja instanciado aqui
 
   UserListPage({super.key});
 
@@ -38,13 +39,15 @@ class UserListPage extends StatelessWidget {
                 onPressed: () {
                   Get.defaultDialog(
                     title: 'Confirmar exclusão',
-                    middleText: 'Tem certeza que deseja excluir o usuário ${user.username}?',
+                    middleText:
+                        'Tem certeza que deseja excluir o usuário ${user.username}?',
                     textCancel: 'Cancelar',
                     textConfirm: 'Excluir',
                     confirmTextColor: Colors.white,
                     onConfirm: () {
-                      controller.deleteUser(user.id);  // Corrigido para usar o id diretamente
-                      Get.back();  // Fecha o dialog
+                      controller.deleteUser(
+                          user.id); // Corrigido para usar o id diretamente
+                      Get.back(); // Fecha o dialog
                     },
                   );
                 },
@@ -54,7 +57,7 @@ class UserListPage extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed('/add-user'),
+        onPressed: () => Get.toNamed(AppRoutes.userForm),
         child: const Icon(Icons.add),
       ),
     );
