@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+// Importação adicionada
+import '../widgets/schedule_detail_widget.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/schedule_controller.dart';
 import '../controllers/patient_controller.dart';
 import '../controllers/exercise_controller.dart';
 import '../../../routes/app_pages.dart';
+import '../models/schedule_model.dart';
 
 class ScheduleListPage extends StatefulWidget {
   const ScheduleListPage({super.key});
@@ -34,6 +38,19 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
       exerciseController.fetchExercises(),
     ]);
     print('Exercícios carregados: ${exerciseController.exercises.length}');
+  }
+
+  void _showScheduleDetailDialog(ScheduleModel schedule) {
+    Get.dialog(
+      AlertDialog(
+        contentPadding: EdgeInsets.zero,
+        content: ScheduleDetailWidget(
+          schedule: schedule,
+          exerciseController: exerciseController,
+        ),
+      ),
+      barrierDismissible: false,
+    );
   }
 
   @override
@@ -70,7 +87,6 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
           itemCount: scheduleController.schedules.length,
           itemBuilder: (_, index) {
             final schedule = scheduleController.schedules[index];
-            print('IDs dos exercícios no agendamento: ${schedule.exerciseIds}');
             final formattedDate =
                 DateFormat('dd/MM/yyyy HH:mm').format(schedule.scheduledTime);
 
@@ -93,6 +109,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
+                onTap: () => _showScheduleDetailDialog(schedule),
                 title: Text(
                   'Paciente: $patientName',
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -137,7 +154,6 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                             .deleteSchedule(schedule.id!);
                         if (success) {
                           Get.back();
-                          // não precisa setState, GetX atualiza a UI via Obx automaticamente
                         } else {
                           Get.snackbar(
                             'Erro',
@@ -172,3 +188,5 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     );
   }
 }
+
+

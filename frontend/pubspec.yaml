@@ -18,6 +18,11 @@ dependencies:
   http: ^1.1.0
   get: ^4.6.5
   google_fonts: ^6.1.0
+  video_player: any
+  youtube_player_flutter: ^8.1.1
+  youtube_player_iframe: ^5.2.1
+
+
 dev_dependencies:
   build_runner: ^2.4.6
   json_serializable: ^6.7.1
