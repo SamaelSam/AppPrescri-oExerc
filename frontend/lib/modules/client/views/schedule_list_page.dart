@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:collection/collection.dart';
 
 import '../controllers/auth_controller.dart';
 import '../controllers/schedule_controller.dart';
@@ -9,22 +8,36 @@ import '../controllers/patient_controller.dart';
 import '../controllers/exercise_controller.dart';
 import '../../../routes/app_pages.dart';
 
-class ScheduleListPage extends StatelessWidget {
+class ScheduleListPage extends StatefulWidget {
+  const ScheduleListPage({super.key});
+
+  @override
+  State<ScheduleListPage> createState() => _ScheduleListPageState();
+}
+
+class _ScheduleListPageState extends State<ScheduleListPage> {
   final AuthController auth = Get.find();
   final ScheduleController scheduleController = Get.find();
   final PatientController patientController = Get.find();
   final ExerciseController exerciseController = Get.find();
 
-  ScheduleListPage({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Future.wait([
+      scheduleController.fetchSchedules(),
+      patientController.fetchPatients(),
+      exerciseController.fetchExercises(),
+    ]);
+    print('Exercícios carregados: ${exerciseController.exercises.length}');
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Carrega todos os dados ao iniciar
-    scheduleController.fetchSchedules();
-    patientController.fetchPatients();
-    exerciseController.fetchExercises();
-    print('Exercícios carregados: ${exerciseController.exercises.length}');
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agendamentos'),
@@ -66,7 +79,6 @@ class ScheduleListPage extends StatelessWidget {
             );
             final patientName = patient?.name ?? 'Paciente desconhecido';
 
-            // Exercícios como lista de widgets para melhor visualização
             final exerciseWidgets = schedule.exerciseIds.map((exId) {
               final exercise = exerciseController.exercises
                   .firstWhereOrNull((e) => e.id == exId);
@@ -89,8 +101,10 @@ class ScheduleListPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 4),
-                    const Text('Exercícios:',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text(
+                      'Exercícios:',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     ...exerciseWidgets,
                     Text('Notas: ${schedule.notes}'),
                     Text('Duração: ${schedule.durationMinutes} minutos'),
@@ -119,8 +133,20 @@ class ScheduleListPage extends StatelessWidget {
                       textCancel: 'Cancelar',
                       confirmTextColor: Colors.white,
                       onConfirm: () async {
-                        await scheduleController.deleteSchedule(schedule.id!);
-                        Get.back();
+                        final success = await scheduleController
+                            .deleteSchedule(schedule.id!);
+                        if (success) {
+                          Get.back();
+                          // não precisa setState, GetX atualiza a UI via Obx automaticamente
+                        } else {
+                          Get.snackbar(
+                            'Erro',
+                            'Falha ao excluir agendamento.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.redAccent,
+                            colorText: Colors.white,
+                          );
+                        }
                       },
                     );
                   },
@@ -131,9 +157,13 @@ class ScheduleListPage extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'schedule_fab',
         onPressed: () async {
-          await Get.toNamed(AppRoutes.scheduleForm);
-          scheduleController.fetchSchedules();
+          final result = await Get.toNamed(AppRoutes.scheduleForm);
+          if (result == true) {
+            await scheduleController.fetchSchedules();
+            setState(() {});
+          }
         },
         backgroundColor: Colors.blueAccent,
         tooltip: 'Novo agendamento',

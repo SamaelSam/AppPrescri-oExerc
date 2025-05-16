@@ -28,8 +28,10 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
   @override
   void initState() {
     super.initState();
-    patientController.fetchPatients();
-    exerciseController.fetchExercises();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      patientController.fetchPatients();
+      exerciseController.fetchExercises();
+    });
   }
 
   void _showMultiSelectExercises() async {
@@ -105,7 +107,8 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
                         child: Text(p.name),
                       );
                     }).toList(),
-                    onChanged: (value) => setState(() => selectedPatientId = value),
+                    onChanged: (value) =>
+                        setState(() => selectedPatientId = value),
                     decoration: const InputDecoration(labelText: 'Paciente'),
                     validator: (value) =>
                         value == null ? 'Selecione um paciente' : null,
@@ -114,7 +117,8 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Exercícios selecionados: ${selectedExerciseIds.length}'),
+                  child: Text(
+                      'Exercícios selecionados: ${selectedExerciseIds.length}'),
                 ),
                 ElevatedButton(
                   onPressed: _showMultiSelectExercises,
@@ -123,22 +127,27 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: dateController,
-                  decoration: const InputDecoration(labelText: 'Data (YYYY-MM-DD)'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  decoration:
+                      const InputDecoration(labelText: 'Data (YYYY-MM-DD)'),
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: timeController,
                   decoration: const InputDecoration(labelText: 'Hora (HH:MM)'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: durationController,
-                  decoration: const InputDecoration(labelText: 'Duração (minutos)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Duração (minutos)'),
                   keyboardType: TextInputType.number,
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: notesController,
@@ -149,9 +158,11 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       if (selectedExerciseIds.isEmpty) {
-                        Get.snackbar('Erro', 'Selecione pelo menos um exercício');
+                        Get.snackbar(
+                            'Erro', 'Selecione pelo menos um exercício');
                         return;
                       }
+
                       try {
                         final date = DateTime.parse(dateController.text);
                         final timeParts = timeController.text.split(':');
@@ -174,7 +185,7 @@ class _ScheduleFormPageState extends State<ScheduleFormPage> {
                           notes: notes,
                         );
 
-                        Get.back();
+                        Get.back(result: true);  
                       } catch (e) {
                         Get.snackbar('Erro', 'Formato inválido nos campos');
                       }

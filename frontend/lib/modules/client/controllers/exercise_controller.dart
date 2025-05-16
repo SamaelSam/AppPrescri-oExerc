@@ -42,7 +42,7 @@ class ExerciseController extends GetxController {
     );
 
     try {
-      final createdExercise = await _repo.create(newExercise); 
+      final createdExercise = await _repo.create(newExercise);
       exercises.add(createdExercise);
     } catch (e) {
       print('Erro ao adicionar exercício: $e');
@@ -52,7 +52,8 @@ class ExerciseController extends GetxController {
   Future<void> deleteExercise(String id) async {
     try {
       await _repo.delete(id);
-      fetchExercises();
+      exercises.removeWhere(
+          (e) => e.id == id); // remove localmente da lista observável
     } catch (e) {
       print('Erro ao deletar exercício: $e');
     }

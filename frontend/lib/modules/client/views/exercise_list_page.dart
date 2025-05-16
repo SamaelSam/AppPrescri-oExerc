@@ -91,9 +91,12 @@ class ExerciseListPage extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'exercise_fab',
         onPressed: () async {
-          await Get.toNamed(AppRoutes.exerciseForm);
-          controller.fetchExercises();
+          final result = await Get.toNamed(AppRoutes.exerciseForm);
+          if (result == true) {
+            await controller.fetchExercises();
+          }
         },
         backgroundColor: Colors.blueAccent,
         child: const Icon(Icons.add),

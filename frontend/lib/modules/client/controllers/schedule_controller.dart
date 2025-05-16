@@ -28,7 +28,7 @@ class ScheduleController extends GetxController {
 
   Future<void> createSchedule({
     required String userId,
-    required List<String> exerciseIds,  // lista de exercícios
+    required List<String> exerciseIds, // lista de exercícios
     required DateTime scheduledTime,
     required int durationMinutes,
     required String notes,
@@ -48,12 +48,15 @@ class ScheduleController extends GetxController {
     }
   }
 
-  Future<void> deleteSchedule(String id) async {
+  Future<bool> deleteSchedule(String id) async {
     try {
       await _repo.delete(id);
       schedules.removeWhere((s) => s.id == id);
+      schedules.refresh(); // FORÇA atualização da UI
+      return true;
     } catch (e) {
       print('Erro ao deletar agendamento: $e');
+      return false;
     }
   }
 }

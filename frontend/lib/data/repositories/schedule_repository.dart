@@ -36,7 +36,7 @@ class ScheduleRepository {
       body: json.encode(jsonBody),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       print('Erro na criação: ${response.statusCode} - ${response.body}');
       throw Exception('Erro ao criar agendamento');
     }
@@ -44,7 +44,7 @@ class ScheduleRepository {
 
   Future<void> delete(String id) async {
     final response = await http.delete(Uri.parse('$baseUrl/schedules/$id'));
-    if (response.statusCode != 204) {
+    if (response.statusCode != 200) {
       throw Exception('Erro ao deletar agendamento');
     }
   }

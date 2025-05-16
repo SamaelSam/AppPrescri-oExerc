@@ -10,7 +10,8 @@ class PatientFormPage extends StatelessWidget {
   final TextEditingController ageController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
-  final TextEditingController medicalConditionController = TextEditingController();
+  final TextEditingController medicalConditionController =
+      TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
@@ -30,53 +31,61 @@ class PatientFormPage extends StatelessWidget {
                 TextFormField(
                   controller: nameController,
                   decoration: const InputDecoration(labelText: 'Nome'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: ageController,
                   decoration: const InputDecoration(labelText: 'Idade'),
                   keyboardType: TextInputType.number,
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: weightController,
                   decoration: const InputDecoration(labelText: 'Peso (kg)'),
                   keyboardType: TextInputType.number,
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: heightController,
                   decoration: const InputDecoration(labelText: 'Altura (cm)'),
                   keyboardType: TextInputType.number,
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: medicalConditionController,
-                  decoration: const InputDecoration(labelText: 'Condição Médica'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  decoration:
+                      const InputDecoration(labelText: 'Condição Médica'),
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: emailController,
                   decoration: const InputDecoration(labelText: 'Email'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: phoneController,
                   decoration: const InputDecoration(labelText: 'Telefone'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      controller.createPatient(
+                      await controller.createPatient(
                         name: nameController.text,
                         age: int.parse(ageController.text),
                         weight: double.parse(weightController.text),
@@ -85,7 +94,8 @@ class PatientFormPage extends StatelessWidget {
                         email: emailController.text,
                         phone: phoneController.text,
                       );
-                      Get.back(); // volta à tela anterior após salvar
+                      Get.back(
+                          result: true); // <- isso aqui faz toda a diferença!
                     }
                   },
                   child: const Text('Salvar'),

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:frontend/modules/client/controllers/exercise_controller.dart';
 
 class ExerciseFormPage extends StatefulWidget {
-  const ExerciseFormPage({Key? key}) : super(key: key);
+  const ExerciseFormPage({super.key});
 
   @override
   State<ExerciseFormPage> createState() => _ExerciseFormPageState();
@@ -43,26 +43,31 @@ class _ExerciseFormPageState extends State<ExerciseFormPage> {
                 TextFormField(
                   controller: nameController,
                   decoration: const InputDecoration(labelText: 'Nome'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: descriptionController,
                   decoration: const InputDecoration(labelText: 'Descrição'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Campo obrigatório'
+                      : null,
                 ),
                 TextFormField(
                   controller: videoUrlController,
-                  decoration: const InputDecoration(labelText: 'URL do vídeo (opcional)'),
+                  decoration: const InputDecoration(
+                      labelText: 'URL do vídeo (opcional)'),
                 ),
                 TextFormField(
                   controller: difficultyController,
-                  decoration: const InputDecoration(labelText: 'Dificuldade (opcional)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Dificuldade (opcional)'),
                 ),
                 TextFormField(
                   controller: categoryController,
-                  decoration: const InputDecoration(labelText: 'Categoria (opcional)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Categoria (opcional)'),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
@@ -81,7 +86,7 @@ class _ExerciseFormPageState extends State<ExerciseFormPage> {
                             ? categoryController.text
                             : null,
                       );
-                      Get.back();
+                      Get.back(result: true);
                     }
                   },
                   child: const Text('Salvar'),

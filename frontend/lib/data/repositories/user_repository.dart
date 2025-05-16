@@ -23,7 +23,7 @@ class UserRepository {
       body: jsonEncode(user.toJson()),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw Exception('Erro ao criar usuário');
     }
   }

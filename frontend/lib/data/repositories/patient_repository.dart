@@ -23,7 +23,7 @@ class PatientRepository {
       body: jsonEncode(patient.toJson()),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw Exception('Erro ao criar paciente');
     }
   }

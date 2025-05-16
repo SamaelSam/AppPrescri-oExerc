@@ -16,13 +16,16 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> pages = [
     PatientListPage(),
     ExerciseListPage(),
-    ScheduleListPage(),
+    const ScheduleListPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[currentIndex],
+      body: IndexedStack(
+        index: currentIndex,
+        children: pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) => setState(() => currentIndex = index),

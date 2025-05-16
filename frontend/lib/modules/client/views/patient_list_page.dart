@@ -8,12 +8,20 @@ class PatientListPage extends StatelessWidget {
   final PatientController controller = Get.find();
   final AuthController auth = Get.find();
 
-  PatientListPage({super.key});
+  PatientListPage({super.key}) {
+    // Chama fetchPatients quando a página for criada (só uma vez)
+    controller.fetchPatients();
+  }
+
+  Future<void> _goToPatientForm() async {
+    final result = await Get.toNamed(AppRoutes.patientForm);
+    if (result == true) {
+      await controller.fetchPatients();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchPatients(); // Carrega pacientes ao entrar
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pacientes'),
@@ -86,10 +94,8 @@ class PatientListPage extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Get.toNamed(AppRoutes.patientForm);
-          controller.fetchPatients();
-        },
+        heroTag: 'patient_fab',
+        onPressed: _goToPatientForm,
         tooltip: 'Adicionar paciente',
         child: const Icon(Icons.add),
       ),

@@ -25,7 +25,7 @@ class ExerciseRepository {
       body: jsonEncode(exercise.toJson()), // 👈 aproveita o toJson do model
     );
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return ExerciseModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       throw Exception('Erro ao criar exercício: ${response.body}');
