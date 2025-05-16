@@ -1,7 +1,7 @@
 class ScheduleModel {
   final String? id;
-  final String userId;
-  final String exerciseId;
+  final String userId; // Id do paciente
+  final List<String> exerciseIds; // Lista de IDs de exercícios
   final DateTime scheduledTime;
   final int durationMinutes;
   final String notes;
@@ -9,7 +9,7 @@ class ScheduleModel {
   ScheduleModel({
     this.id,
     required this.userId,
-    required this.exerciseId,
+    required this.exerciseIds,
     required this.scheduledTime,
     required this.durationMinutes,
     required this.notes,
@@ -19,10 +19,10 @@ class ScheduleModel {
     return ScheduleModel(
       id: json['_id'],
       userId: json['user_id'],
-      exerciseId: json['exercise_id'],
+      exerciseIds: List<String>.from(json['exercise_ids'] ?? []),
       scheduledTime: DateTime.parse(json['scheduled_time']),
       durationMinutes: json['duration_minutes'],
-      notes: json['notes'],
+      notes: json['notes'] ?? '',
     );
   }
 
@@ -30,7 +30,7 @@ class ScheduleModel {
     return {
       '_id': id,
       'user_id': userId,
-      'exercise_id': exerciseId,
+      'exercise_ids': exerciseIds,
       'scheduled_time': scheduledTime.toIso8601String(),
       'duration_minutes': durationMinutes,
       'notes': notes,

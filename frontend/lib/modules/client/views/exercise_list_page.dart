@@ -91,7 +91,10 @@ class ExerciseListPage extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed(AppRoutes.exerciseForm),
+        onPressed: () async {
+          await Get.toNamed(AppRoutes.exerciseForm);
+          controller.fetchExercises();
+        },
         backgroundColor: Colors.blueAccent,
         child: const Icon(Icons.add),
       ),

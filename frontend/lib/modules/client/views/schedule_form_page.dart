@@ -1,19 +1,89 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:frontend/modules/client/controllers/schedule_controller.dart';
+import 'package:frontend/modules/client/controllers/patient_controller.dart';
+import 'package:frontend/modules/client/controllers/exercise_controller.dart';
 
-class ScheduleFormPage extends StatelessWidget {
-  final ScheduleController controller = Get.find();
+class ScheduleFormPage extends StatefulWidget {
+  const ScheduleFormPage({super.key});
+
+  @override
+  State<ScheduleFormPage> createState() => _ScheduleFormPageState();
+}
+
+class _ScheduleFormPageState extends State<ScheduleFormPage> {
+  final ScheduleController scheduleController = Get.find();
+  final PatientController patientController = Get.find();
+  final ExerciseController exerciseController = Get.find();
+
   final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController userIdController = TextEditingController();
-  final TextEditingController exerciseIdController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
   final TextEditingController durationController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
 
-  ScheduleFormPage({super.key});
+  String? selectedPatientId;
+  List<String> selectedExerciseIds = [];
+
+  @override
+  void initState() {
+    super.initState();
+    patientController.fetchPatients();
+    exerciseController.fetchExercises();
+  }
+
+  void _showMultiSelectExercises() async {
+    final exercises = exerciseController.exercises;
+    final List<String> tempSelected = List.from(selectedExerciseIds);
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Selecione os Exercícios'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: exercises.map((exercise) {
+                    final isSelected = tempSelected.contains(exercise.id);
+                    return CheckboxListTile(
+                      value: isSelected,
+                      title: Text(exercise.name),
+                      onChanged: (bool? checked) {
+                        setState(() {
+                          if (checked == true) {
+                            tempSelected.add(exercise.id!);
+                          } else {
+                            tempSelected.remove(exercise.id);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  selectedExerciseIds = tempSelected;
+                });
+                Navigator.pop(ctx);
+              },
+              child: const Text('Confirmar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +96,31 @@ class ScheduleFormPage extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                TextFormField(
-                  controller: userIdController,
-                  decoration: const InputDecoration(labelText: 'ID do Paciente'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                Obx(() {
+                  return DropdownButtonFormField<String>(
+                    value: selectedPatientId,
+                    items: patientController.patients.map((p) {
+                      return DropdownMenuItem(
+                        value: p.id,
+                        child: Text(p.name),
+                      );
+                    }).toList(),
+                    onChanged: (value) => setState(() => selectedPatientId = value),
+                    decoration: const InputDecoration(labelText: 'Paciente'),
+                    validator: (value) =>
+                        value == null ? 'Selecione um paciente' : null,
+                  );
+                }),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Exercícios selecionados: ${selectedExerciseIds.length}'),
                 ),
-                TextFormField(
-                  controller: exerciseIdController,
-                  decoration: const InputDecoration(labelText: 'ID do Exercício'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                ElevatedButton(
+                  onPressed: _showMultiSelectExercises,
+                  child: const Text('Selecionar Exercícios'),
                 ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: dateController,
                   decoration: const InputDecoration(labelText: 'Data (YYYY-MM-DD)'),
@@ -65,6 +148,10 @@ class ScheduleFormPage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
+                      if (selectedExerciseIds.isEmpty) {
+                        Get.snackbar('Erro', 'Selecione pelo menos um exercício');
+                        return;
+                      }
                       try {
                         final date = DateTime.parse(dateController.text);
                         final timeParts = timeController.text.split(':');
@@ -75,20 +162,21 @@ class ScheduleFormPage extends StatelessWidget {
                           int.parse(timeParts[0]),
                           int.parse(timeParts[1]),
                         );
+
                         final duration = int.parse(durationController.text);
                         final notes = notesController.text;
 
-                        controller.createSchedule(
-                          userId: userIdController.text,
-                          exerciseId: exerciseIdController.text,
+                        scheduleController.createSchedule(
+                          userId: selectedPatientId!,
+                          exerciseIds: selectedExerciseIds,
                           scheduledTime: scheduledTime,
                           durationMinutes: duration,
                           notes: notes,
                         );
 
-                        Get.back(); // Volta à tela anterior após salvar
+                        Get.back();
                       } catch (e) {
-                        Get.snackbar('Erro', 'Formato inválido nos campos de data, hora ou duração');
+                        Get.snackbar('Erro', 'Formato inválido nos campos');
                       }
                     }
                   },

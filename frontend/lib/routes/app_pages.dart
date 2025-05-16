@@ -25,9 +25,8 @@ class AppRoutes {
   static const exerciseForm = '/exercises/new';
   static const exerciseList = '/exercises';
   static const userForm = '/users/new';
-  static const userList = '/users'; 
-  static const home = '/home'; 
-
+  static const userList = '/users';
+  static const home = '/home';
 }
 
 final List<GetPage> appPages = [
@@ -36,23 +35,25 @@ final List<GetPage> appPages = [
     page: () => LoginPage(),
   ),
   GetPage(
-  name: AppRoutes.home,
-  page: () => const HomePage(),
-  bindings: [
-    BindingsBuilder(() {
-      Get.put(PatientController());
-      Get.put(ExerciseController());
-      Get.put(ScheduleController()); // Usado como "Prescrições"
-    }),
-  ],
-  middlewares: [AuthMiddleware()],
-),
+    name: AppRoutes.home,
+    page: () => const HomePage(),
+    bindings: [
+      BindingsBuilder(() {
+        Get.put(PatientController());
+        Get.put(ExerciseController());
+        Get.put(ScheduleController()); // Usado como "Prescrições"
+      }),
+    ],
+    middlewares: [AuthMiddleware()],
+  ),
   GetPage(
     name: AppRoutes.scheduleList,
     page: () => ScheduleListPage(),
     bindings: [
       BindingsBuilder(() {
         Get.put(ScheduleController());
+        Get.put(ExerciseController());
+        Get.put(PatientController());
       }),
     ],
     middlewares: [AuthMiddleware()],
@@ -65,6 +66,7 @@ final List<GetPage> appPages = [
         Get.put(ScheduleController());
         Get.put(UserController());
         Get.put(ExerciseController());
+        Get.put(PatientController());
       }),
     ],
     middlewares: [AuthMiddleware()],

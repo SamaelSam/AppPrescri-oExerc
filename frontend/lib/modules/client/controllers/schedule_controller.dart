@@ -28,7 +28,7 @@ class ScheduleController extends GetxController {
 
   Future<void> createSchedule({
     required String userId,
-    required String exerciseId,
+    required List<String> exerciseIds,  // lista de exercícios
     required DateTime scheduledTime,
     required int durationMinutes,
     required String notes,
@@ -36,7 +36,7 @@ class ScheduleController extends GetxController {
     try {
       final schedule = ScheduleModel(
         userId: userId,
-        exerciseId: exerciseId,
+        exerciseIds: exerciseIds,
         scheduledTime: scheduledTime,
         durationMinutes: durationMinutes,
         notes: notes,

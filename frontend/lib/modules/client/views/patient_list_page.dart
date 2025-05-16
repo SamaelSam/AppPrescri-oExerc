@@ -53,7 +53,8 @@ class PatientListPage extends StatelessWidget {
               child: ListTile(
                 title: Text(
                   p.name,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
                   'ID: ${p.id}\n'
@@ -85,7 +86,10 @@ class PatientListPage extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed(AppRoutes.patientForm),
+        onPressed: () async {
+          await Get.toNamed(AppRoutes.patientForm);
+          controller.fetchPatients();
+        },
         tooltip: 'Adicionar paciente',
         child: const Icon(Icons.add),
       ),

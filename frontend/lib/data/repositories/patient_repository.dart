@@ -9,7 +9,7 @@ class PatientRepository {
     final response = await http.get(Uri.parse('$baseUrl/patients'));
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
+      final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes)); // 👈 aqui é o fix
       return data.map((json) => Patient.fromJson(json)).toList();
     } else {
       throw Exception('Erro ao buscar pacientes');

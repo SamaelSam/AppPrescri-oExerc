@@ -27,34 +27,27 @@ class ExerciseController extends GetxController {
   }
 
   Future<void> addExercise({
-  required String id,
-  required String name,
-  required String description,
-  String? videoUrl,
-  String? difficulty,
-  String? category,
-}) async {
-  // Criando o objeto ExerciseModel
-  final newExercise = ExerciseModel(
-    id: id, // O backend irá gerar o ID, não passamos o ID no frontend
-    name: name,
-    description: description,
-    videoUrl: videoUrl,
-    difficulty: difficulty,
-    category: category,
-  );
+    required String name,
+    required String description,
+    String? videoUrl,
+    String? difficulty,
+    String? category,
+  }) async {
+    final newExercise = ExerciseModel(
+      name: name,
+      description: description,
+      videoUrl: videoUrl,
+      difficulty: difficulty,
+      category: category,
+    );
 
-  try {
-    // Passando o objeto ExerciseModel para o repositório
-    final createdExercise = await _repo.create(newExercise); 
-    exercises.add(createdExercise); // Adicionando o exercício à lista após a criação
-  } catch (e) {
-    print('Erro ao adicionar exercício: $e');
+    try {
+      final createdExercise = await _repo.create(newExercise); 
+      exercises.add(createdExercise);
+    } catch (e) {
+      print('Erro ao adicionar exercício: $e');
+    }
   }
-}
-
-
-
 
   Future<void> deleteExercise(String id) async {
     try {

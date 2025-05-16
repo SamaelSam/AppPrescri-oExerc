@@ -6,13 +6,14 @@ from app.models.exercise import Exercise
 collection = get_collection("fitness_app.exercises")
 
 async def create_exercise(exercise: Exercise) -> dict:
-    # Converte o objeto Pydantic em dicionário
-    exercise_data = exercise.model_dump()
+    # Converte o objeto Pydantic em dicionário, excluindo campos None
+    exercise_data = exercise.model_dump(exclude_none=True)
     result = await collection.insert_one(exercise_data)
     return {
         "name": exercise_data["name"],
         "_id": str(result.inserted_id)
     }
+
 
 async def get_exercise_by_name(name: str) -> dict | None:
     exercise = await collection.find_one({"name": name})

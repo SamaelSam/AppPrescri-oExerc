@@ -5,40 +5,34 @@ import 'package:frontend/modules/client/models/exercise_model.dart';
 class ExerciseRepository {
   final String baseUrl = 'http://localhost:8000'; // Altere se necessário
 
+  // Buscar todos os exercícios
   Future<List<ExerciseModel>> getAll() async {
     final response = await http.get(Uri.parse('$baseUrl/exercises'));
 
     if (response.statusCode == 200) {
-      final List<dynamic> body = json.decode(response.body);
+      final List<dynamic> body = json.decode(utf8.decode(response.bodyBytes));
       return body.map((e) => ExerciseModel.fromJson(e)).toList();
     } else {
       throw Exception('Falha ao carregar exercícios');
     }
   }
 
+  // Criar um novo exercício
   Future<ExerciseModel> create(ExerciseModel exercise) async {
-    final Map<String, dynamic> data = {
-      'id': exercise.id,
-      'name': exercise.name,
-      'description': exercise.description,
-      if (exercise.videoUrl != null) 'videoUrl': exercise.videoUrl,
-      if (exercise.difficulty != null) 'difficulty': exercise.difficulty,
-      if (exercise.category != null) 'category': exercise.category,
-    };
-
     final response = await http.post(
       Uri.parse('$baseUrl/exercises'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
+      body: jsonEncode(exercise.toJson()), // 👈 aproveita o toJson do model
     );
 
     if (response.statusCode == 201) {
-      return ExerciseModel.fromJson(jsonDecode(response.body));
+      return ExerciseModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       throw Exception('Erro ao criar exercício: ${response.body}');
     }
   }
 
+  // Deletar exercício por ID
   Future<void> delete(String id) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/exercises/$id'),
