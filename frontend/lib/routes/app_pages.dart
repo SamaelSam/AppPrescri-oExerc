@@ -8,6 +8,7 @@ import '../modules/client/views/exercise_form_page.dart';
 import '../modules/client/views/exercise_list_page.dart';
 import '../modules/client/views/user_form_page.dart';
 import '../modules/client/views/user_list_page.dart'; // NOVA IMPORTAÇÃO
+import '../modules/client/views/home_page.dart'; // <--- Adicione esta linha
 
 import '../modules/client/controllers/schedule_controller.dart';
 import '../modules/client/controllers/patient_controller.dart';
@@ -24,7 +25,9 @@ class AppRoutes {
   static const exerciseForm = '/exercises/new';
   static const exerciseList = '/exercises';
   static const userForm = '/users/new';
-  static const userList = '/users'; // NOVA ROTA ADICIONADA
+  static const userList = '/users'; 
+  static const home = '/home'; 
+
 }
 
 final List<GetPage> appPages = [
@@ -32,6 +35,18 @@ final List<GetPage> appPages = [
     name: AppRoutes.login,
     page: () => LoginPage(),
   ),
+  GetPage(
+  name: AppRoutes.home,
+  page: () => const HomePage(),
+  bindings: [
+    BindingsBuilder(() {
+      Get.put(PatientController());
+      Get.put(ExerciseController());
+      Get.put(ScheduleController()); // Usado como "Prescrições"
+    }),
+  ],
+  middlewares: [AuthMiddleware()],
+),
   GetPage(
     name: AppRoutes.scheduleList,
     page: () => ScheduleListPage(),

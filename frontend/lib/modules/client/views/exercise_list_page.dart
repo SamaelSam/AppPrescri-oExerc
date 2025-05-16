@@ -15,7 +15,6 @@ class ExerciseListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Exercícios'),
-        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),

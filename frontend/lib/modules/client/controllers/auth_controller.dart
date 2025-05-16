@@ -21,7 +21,7 @@ class AuthController extends GetxController {
     print("Login bem-sucedido, token: ${auth.accessToken}");
     print("Token setado no controlador: ${token.value?.accessToken}");
 
-    Get.offAllNamed(AppRoutes.userList); // ← redireciona
+    Get.offAllNamed(AppRoutes.home); // ← redireciona
   } catch (e) {
     Get.snackbar(
       'Erro de login',
