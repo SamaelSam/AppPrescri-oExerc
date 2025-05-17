@@ -4,6 +4,8 @@ import '../../modules/client/models/auth_token_model.dart';
 
 class AuthRepository {
   final String baseUrl = 'http://localhost:8000';
+  
+  
   Future<bool> register({
     required String username,
     required String email,
@@ -26,7 +28,7 @@ class AuthRepository {
       return false;
     }
   }
-  
+
   Future<AuthToken> login(String email, String password) async {
     final response = await http.post(
     Uri.parse('$baseUrl/login'),
