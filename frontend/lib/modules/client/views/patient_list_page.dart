@@ -65,7 +65,6 @@ class PatientListPage extends StatelessWidget {
                       fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  'ID: ${p.id}\n'
                   'Idade: ${p.age} | Peso: ${p.weight}kg | Altura: ${p.height}cm\n'
                   'Condição Médica: ${p.medicalCondition}',
                   style: const TextStyle(fontSize: 14),

@@ -68,85 +68,94 @@ class _ScheduleDetailWidgetState extends State<ScheduleDetailWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final exId = widget.schedule.exerciseIds[currentExerciseIndex];
-    final exercise = widget.exerciseController.exercises
-        .firstWhereOrNull((e) => e.id == exId);
+Widget build(BuildContext context) {
+  final exId = widget.schedule.exerciseIds[currentExerciseIndex];
+  final exercise = widget.exerciseController.exercises
+      .firstWhereOrNull((e) => e.id == exId);
 
-    return SizedBox(
-      width: 400,
-      height: 500,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
+  return SizedBox(
+    width: 400,
+    height: 500,
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // BOTÃO DE VOLTAR
+          Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Get.back(),
+            ),
+          ),
+
+          Text(
+            'Exercício ${currentExerciseIndex + 1} de ${widget.schedule.exerciseIds.length}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          if (exercise != null) ...[
             Text(
-              'Exercício ${currentExerciseIndex + 1} de ${widget.schedule.exerciseIds.length}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              exercise.name,
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
-            if (exercise != null) ...[
-              Text(
-                exercise.name,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 10),
-              if (_youtubeController != null)
-                SizedBox(
-                  width: double.infinity,
-                  height: 260,
-                  child: YoutubePlayer(
-                    controller: _youtubeController!,
-                    aspectRatio: 16 / 9,
-                  ),
-                )
-              else
-                const Text(
-                  'Vídeo não disponível para este exercício.',
-                  style: TextStyle(color: Colors.grey),
+            if (_youtubeController != null)
+              SizedBox(
+                width: double.infinity,
+                height: 260,
+                child: YoutubePlayer(
+                  controller: _youtubeController!,
+                  aspectRatio: 16 / 9,
                 ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Text(
-                    exercise.description,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ),
+              )
+            else
+              const Text(
+                'Vídeo não disponível para este exercício.',
+                style: TextStyle(color: Colors.grey),
               ),
-            ],
             const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: currentExerciseIndex > 0
-                      ? () {
-                          setState(() {
-                            currentExerciseIndex--;
-                            _initVideo();
-                          });
-                        }
-                      : null,
-                  child: const Text('Anterior'),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Text(
+                  exercise.description,
+                  style: const TextStyle(fontSize: 14),
                 ),
-                ElevatedButton(
-                  onPressed: currentExerciseIndex <
-                          widget.schedule.exerciseIds.length - 1
-                      ? () {
-                          setState(() {
-                            currentExerciseIndex++;
-                            _initVideo();
-                          });
-                        }
-                      : null,
-                  child: const Text('Próximo'),
-                ),
-              ],
+              ),
             ),
           ],
-        ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                onPressed: currentExerciseIndex > 0
+                    ? () {
+                        setState(() {
+                          currentExerciseIndex--;
+                          _initVideo();
+                        });
+                      }
+                    : null,
+                child: const Text('Anterior'),
+              ),
+              ElevatedButton(
+                onPressed: currentExerciseIndex <
+                        widget.schedule.exerciseIds.length - 1
+                    ? () {
+                        setState(() {
+                          currentExerciseIndex++;
+                          _initVideo();
+                        });
+                      }
+                    : null,
+                child: const Text('Próximo'),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
