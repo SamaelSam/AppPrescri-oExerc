@@ -4,6 +4,7 @@ import 'package:frontend/modules/client/models/patient_model.dart';
 
 class PatientController extends GetxController {
   final PatientRepository _repo = PatientRepository();
+
   final RxList<Patient> patients = <Patient>[].obs;
   final RxBool isLoading = false.obs;
 
@@ -20,12 +21,18 @@ class PatientController extends GetxController {
       patients.assignAll(data);
     } catch (e) {
       print('Erro ao buscar pacientes: $e');
+      Get.snackbar(
+        'Erro',
+        'Não foi possível carregar os pacientes',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Método atualizado para criar um paciente com todos os campos
   Future<void> createPatient({
     required String name,
     required int age,
@@ -47,9 +54,23 @@ class PatientController extends GetxController {
 
     try {
       await _repo.create(newPatient);
-      fetchPatients();
+      await fetchPatients();
+      Get.snackbar(
+        'Sucesso',
+        'Paciente criado com sucesso!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.primary,
+        colorText: Get.theme.colorScheme.onPrimary,
+      );
     } catch (e) {
       print('Erro ao criar paciente: $e');
+      Get.snackbar(
+        'Erro',
+        'Não foi possível criar o paciente',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
     }
   }
 
@@ -57,8 +78,22 @@ class PatientController extends GetxController {
     try {
       await _repo.delete(id);
       patients.removeWhere((p) => p.id == id);
+      Get.snackbar(
+        'Sucesso',
+        'Paciente removido com sucesso!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.primary,
+        colorText: Get.theme.colorScheme.onPrimary,
+      );
     } catch (e) {
       print('Erro ao deletar paciente: $e');
+      Get.snackbar(
+        'Erro',
+        'Não foi possível excluir o paciente',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
     }
   }
 }

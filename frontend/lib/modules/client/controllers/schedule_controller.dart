@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:get/get.dart'; 
 import 'package:frontend/data/repositories/schedule_repository.dart';
 import 'package:frontend/modules/client/models/schedule_model.dart';
 
@@ -7,6 +7,9 @@ class ScheduleController extends GetxController {
 
   final RxList<ScheduleModel> schedules = <ScheduleModel>[].obs;
   final RxBool isLoading = false.obs;
+
+  // Id do paciente selecionado
+  final RxString selectedPatientId = ''.obs;
 
   @override
   void onInit() {
@@ -26,9 +29,24 @@ class ScheduleController extends GetxController {
     }
   }
 
+  // Buscar agendamentos de um paciente específico
+  Future<void> fetchSchedulesForPatient(String userId) async {
+    try {
+      isLoading.value = true;
+      selectedPatientId.value = userId;  // Atualiza paciente selecionado
+      final data = await _repo.getByUserId(userId);
+      schedules.assignAll(data);
+    } catch (e) {
+      print('Erro ao buscar agendamentos do paciente: $e');
+      schedules.clear();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> createSchedule({
     required String userId,
-    required List<String> exerciseIds, // lista de exercícios
+    required List<String> exerciseIds,
     required DateTime scheduledTime,
     required int durationMinutes,
     required String notes,
@@ -52,7 +70,7 @@ class ScheduleController extends GetxController {
     try {
       await _repo.delete(id);
       schedules.removeWhere((s) => s.id == id);
-      schedules.refresh(); // FORÇA atualização da UI
+      schedules.refresh();
       return true;
     } catch (e) {
       print('Erro ao deletar agendamento: $e');

@@ -42,6 +42,18 @@ class ScheduleRepository {
     }
   }
 
+  Future<List<ScheduleModel>> getByUserId(String userId) async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/schedules/user/$userId'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+      return data.map((json) => ScheduleModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Erro ao buscar agendamentos do paciente');
+    }
+  }
+
   Future<void> delete(String id) async {
     final response = await http.delete(Uri.parse('$baseUrl/schedules/$id'));
     if (response.statusCode != 200) {

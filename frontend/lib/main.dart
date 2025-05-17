@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
           titleMedium: TextStyle(color: Colors.white),
         ),
       ),
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.register,
       getPages: appPages,
     );
   }

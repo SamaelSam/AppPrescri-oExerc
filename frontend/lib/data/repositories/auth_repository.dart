@@ -4,7 +4,29 @@ import '../../modules/client/models/auth_token_model.dart';
 
 class AuthRepository {
   final String baseUrl = 'http://localhost:8000';
+  Future<bool> register({
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': username,
+        'email': email,
+        'password': password,
+      }),
+    );
 
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      print('Erro no registro: ${response.body}');
+      return false;
+    }
+  }
+  
   Future<AuthToken> login(String email, String password) async {
     final response = await http.post(
     Uri.parse('$baseUrl/login'),
