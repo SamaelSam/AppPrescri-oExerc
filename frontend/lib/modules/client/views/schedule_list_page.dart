@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:frontend/modules/client/views/schedule_detail_page.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -40,18 +41,13 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     print('Exercícios carregados: ${exerciseController.exercises.length}');
   }
 
-  void _showScheduleDetailDialog(ScheduleModel schedule) {
-    Get.dialog(
-      AlertDialog(
-        contentPadding: EdgeInsets.zero,
-        content: ScheduleDetailWidget(
-          schedule: schedule,
-          exerciseController: exerciseController,
-        ),
-      ),
-      barrierDismissible: false,
-    );
-  }
+  void _showScheduleDetailPage(ScheduleModel schedule) {
+  Get.to(() => ScheduleDetailPage(
+        schedule: schedule,
+        exerciseController: exerciseController,
+      ));
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +105,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
-                onTap: () => _showScheduleDetailDialog(schedule),
+                onTap: () => _showScheduleDetailPage(schedule),
                 title: Text(
                   'Paciente: $patientName',
                   style: const TextStyle(fontWeight: FontWeight.bold),
