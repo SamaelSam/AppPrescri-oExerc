@@ -9,8 +9,10 @@ class PatientListPage extends StatelessWidget {
   final AuthController auth = Get.find();
 
   PatientListPage({super.key}) {
-    // Chama fetchPatients quando a página for criada (só uma vez)
-    controller.fetchPatients();
+    // Executa fetchPatients depois que o widget for montado
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchPatients();
+    });
   }
 
   Future<void> _goToPatientForm() async {
@@ -79,9 +81,25 @@ class PatientListPage extends StatelessWidget {
                       textCancel: 'Não',
                       confirmTextColor: Colors.white,
                       onConfirm: () async {
+                        Get.back(); // Fecha o diálogo antes da exclusão
+                        print('Iniciando deleção do paciente...');
                         if (p.id != null) {
-                          await controller.deletePatient(p.id!);
-                          Get.back();
+                          try {
+                            await controller.deletePatient(p.id!);
+                            print('Paciente deletado com sucesso');
+
+                            await controller
+                                .fetchPatients(); // Atualiza a lista
+                          } catch (e) {
+                            print('Erro ao deletar paciente: $e');
+                            Get.snackbar(
+                              'Erro',
+                              'Erro ao excluir paciente',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red.shade600,
+                              colorText: Colors.white,
+                            );
+                          }
                         }
                       },
                     );
@@ -96,6 +114,7 @@ class PatientListPage extends StatelessWidget {
         heroTag: 'patient_fab',
         onPressed: _goToPatientForm,
         tooltip: 'Adicionar paciente',
+        backgroundColor: Colors.blueAccent,
         child: const Icon(Icons.add),
       ),
     );

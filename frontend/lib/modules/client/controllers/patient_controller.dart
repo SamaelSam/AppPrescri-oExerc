@@ -75,8 +75,10 @@ class PatientController extends GetxController {
   }
 
   Future<void> deletePatient(String id) async {
+    print('Chamando o repo para deletar o paciente $id');
     try {
       await _repo.delete(id);
+      print('Removendo paciente da lista local');
       patients.removeWhere((p) => p.id == id);
       Get.snackbar(
         'Sucesso',
@@ -86,7 +88,7 @@ class PatientController extends GetxController {
         colorText: Get.theme.colorScheme.onPrimary,
       );
     } catch (e) {
-      print('Erro ao deletar paciente: $e');
+      print('Erro no deletePatient: $e');
       Get.snackbar(
         'Erro',
         'Não foi possível excluir o paciente',
@@ -94,6 +96,7 @@ class PatientController extends GetxController {
         backgroundColor: Get.theme.colorScheme.error,
         colorText: Get.theme.colorScheme.onError,
       );
+      rethrow; // importante para que o erro chegue ao onConfirm também
     }
   }
 }

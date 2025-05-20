@@ -29,10 +29,11 @@ class PatientRepository {
   }
 
   Future<void> delete(String id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/patients/$id'));
+  final response = await http.delete(Uri.parse('$baseUrl/patients/$id'));
 
-    if (response.statusCode != 200) {
-      throw Exception('Erro ao deletar paciente');
-    }
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    throw Exception('Erro ao deletar paciente');
   }
+}
+
 }
