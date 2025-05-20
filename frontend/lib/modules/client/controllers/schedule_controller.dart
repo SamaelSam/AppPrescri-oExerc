@@ -1,21 +1,17 @@
-import 'package:get/get.dart'; 
+import 'package:get/get.dart';
 import 'package:frontend/data/repositories/schedule_repository.dart';
 import 'package:frontend/modules/client/models/schedule_model.dart';
+import 'package:frontend/modules/client/controllers/auth_controller.dart';
 
 class ScheduleController extends GetxController {
   final ScheduleRepository _repo = ScheduleRepository();
+  final AuthController authController = Get.find<AuthController>();
 
   final RxList<ScheduleModel> schedules = <ScheduleModel>[].obs;
   final RxBool isLoading = false.obs;
 
   // Id do paciente selecionado
   final RxString selectedPatientId = ''.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchSchedules();
-  }
 
   Future<void> fetchSchedules() async {
     try {
@@ -29,15 +25,24 @@ class ScheduleController extends GetxController {
     }
   }
 
-  // Buscar agendamentos de um paciente específico
-  Future<void> fetchSchedulesForPatient(String userId) async {
+  /// Buscar agendamentos de um paciente específico por e-mail
+  Future<void> fetchSchedulesForPatientByEmail(String patientEmail) async {
     try {
       isLoading.value = true;
-      selectedPatientId.value = userId;  // Atualiza paciente selecionado
-      final data = await _repo.getByUserId(userId);
+
+      final currentUserEmail = authController.user.value?.email;
+
+      if (currentUserEmail == null || currentUserEmail != patientEmail) {
+        print(
+            'Acesso negado: o email do paciente não corresponde ao do usuário logado.');
+        schedules.clear();
+        return;
+      }
+
+      final data = await _repo.getByPatientEmail(patientEmail);
       schedules.assignAll(data);
     } catch (e) {
-      print('Erro ao buscar agendamentos do paciente: $e');
+      print('Erro ao buscar agendamentos por email: $e');
       schedules.clear();
     } finally {
       isLoading.value = false;

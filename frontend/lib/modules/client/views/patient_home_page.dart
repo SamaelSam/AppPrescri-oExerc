@@ -1,74 +1,63 @@
 // pages/patient_home_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/patient_controller.dart';
 import '../controllers/schedule_controller.dart';
+import '../controllers/auth_controller.dart';
 
-class PatientHomePage extends StatelessWidget {
-  final PatientController patientController = Get.find();
+class PatientHomePage extends StatefulWidget {
+  const PatientHomePage({super.key});
+
+  @override
+  State<PatientHomePage> createState() => _PatientHomePageState();
+}
+
+class _PatientHomePageState extends State<PatientHomePage> {
   final ScheduleController scheduleController = Get.find();
+  final AuthController authController = Get.find();
 
-  PatientHomePage({super.key});
+  @override
+  void initState() {
+    super.initState();
+    // Usa postFrameCallback para chamar após o build inicial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final email = authController.user.value?.email;
+      if (email != null) {
+        scheduleController.fetchSchedulesForPatientByEmail(email);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pacientes e Agendamentos')),
-      body: Column(
-        children: [
-          // Lista de pacientes
-          Expanded(
-            child: Obx(() {
-              if (patientController.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (patientController.patients.isEmpty) {
-                return const Center(child: Text('Nenhum paciente cadastrado'));
-              }
-              return ListView.builder(
-                itemCount: patientController.patients.length,
-                itemBuilder: (context, index) {
-                  final patient = patientController.patients[index];
-                  final isSelected = scheduleController.selectedPatientId.value == patient.id;
+      appBar: AppBar(title: const Text('Meus Agendamentos')),
+      body: Obx(() {
+        if (scheduleController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (scheduleController.schedules.isEmpty) {
+          return const Center(child: Text('Nenhum agendamento encontrado'));
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.all(8),
+          itemCount: scheduleController.schedules.length,
+          separatorBuilder: (_, __) => const Divider(),
+          itemBuilder: (context, index) {
+            final schedule = scheduleController.schedules[index];
+            final formattedTime =
+                TimeOfDay.fromDateTime(schedule.scheduledTime).format(context);
+            final formattedDateTime =
+                '${schedule.scheduledTime.day}/${schedule.scheduledTime.month}/${schedule.scheduledTime.year} às $formattedTime';
 
-                  return ListTile(
-                    title: Text(patient.name),
-                    selected: isSelected,
-                    selectedTileColor: Colors.blue.shade100,
-                    onTap: () {
-                      scheduleController.fetchSchedulesForPatient(patient.id!);
-                    },
-                  );
-                },
-              );
-            }),
-          ),
-
-          const Divider(),
-
-          // Lista de agendamentos do paciente selecionado
-          Expanded(
-            child: Obx(() {
-              if (scheduleController.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (scheduleController.schedules.isEmpty) {
-                return const Center(child: Text('Nenhum agendamento'));
-              }
-              return ListView.builder(
-                itemCount: scheduleController.schedules.length,
-                itemBuilder: (context, index) {
-                  final schedule = scheduleController.schedules[index];
-                  return ListTile(
-                    title: Text('Agendamento em ${schedule.scheduledTime}'),
-                    subtitle: Text('Duração: ${schedule.durationMinutes} min'),
-                  );
-                },
-              );
-            }),
-          ),
-        ],
-      ),
+            return ListTile(
+              title: Text('Agendamento em $formattedDateTime'),
+              subtitle: Text(
+                  'Duração: ${schedule.durationMinutes} min\nNotas: ${schedule.notes}'),
+              isThreeLine: true,
+            );
+          },
+        );
+      }),
     );
   }
 }

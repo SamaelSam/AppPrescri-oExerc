@@ -24,6 +24,64 @@ class AuthController extends GetxController {
     );
   }
 
+  Future<bool> registerWithPatient({
+    required String username,
+    required String email,
+    required String password,
+    required String name,
+    required int age,
+    required double weight,
+    required double height,
+    required String medicalCondition,
+    required String phone,
+  }) async {
+    try {
+      // 1. Registro do usuário
+      final registered = await _repo.register(
+        username: username,
+        email: email,
+        password: password,
+      );
+
+      if (!registered) return false;
+
+      // 2. Login automático após registro
+      final authToken = await _repo.login(email, password);
+      token.value = authToken;
+      user.value = authToken.user;
+
+      final box = GetStorage();
+      await box.write('token', authToken.accessToken);
+      await box.write('user_role', authToken.user.role);
+
+      // 3. Criação do paciente vinculado ao usuário logado
+      final created = await _repo.createPatientFromUser(
+        userId: int.parse(authToken.user.id),
+        name: name,
+        email: email,
+        age: age,
+        weight: weight,
+        height: height,
+        medicalCondition: medicalCondition,
+        phone: phone,
+      );
+
+      // 4. Redirecionamento baseado na role
+      if (created) {
+        if (authToken.user.role == 'admin') {
+          Get.offAllNamed(AppRoutes.home);
+        } else {
+          Get.offAllNamed(AppRoutes.patientHome);
+        }
+      }
+
+      return created;
+    } catch (e) {
+      debugPrint('Erro ao registrar com paciente: $e');
+      return false;
+    }
+  }
+
   Future<void> login(String email, String password) async {
     try {
       final AuthToken authToken = await _repo.login(email, password);
@@ -34,7 +92,6 @@ class AuthController extends GetxController {
       await box.write('token', authToken.accessToken);
       await box.write('user_role', authToken.user.role);
 
-      // Redireciona conforme a role
       if (authToken.user.role == 'admin') {
         Get.offAllNamed(AppRoutes.home);
       } else {
