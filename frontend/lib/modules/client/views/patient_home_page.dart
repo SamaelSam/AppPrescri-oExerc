@@ -1,8 +1,11 @@
-// pages/patient_home_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controllers/schedule_controller.dart';
 import '../controllers/auth_controller.dart';
+import '../controllers/exercise_controller.dart';
+import '../views/schedule_detail_page.dart';
+import '../models/schedule_model.dart';
 
 class PatientHomePage extends StatefulWidget {
   const PatientHomePage({super.key});
@@ -14,17 +17,27 @@ class PatientHomePage extends StatefulWidget {
 class _PatientHomePageState extends State<PatientHomePage> {
   final ScheduleController scheduleController = Get.find();
   final AuthController authController = Get.find();
+  final ExerciseController exerciseController = Get.find();
 
   @override
   void initState() {
     super.initState();
-    // Usa postFrameCallback para chamar após o build inicial
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final email = authController.user.value?.email;
       if (email != null) {
-        scheduleController.fetchSchedulesForPatientByEmail(email);
+        await Future.wait([
+          scheduleController.fetchSchedulesForPatientByEmail(email),
+          exerciseController.fetchExercises(), // necessário para detalhes
+        ]);
       }
     });
+  }
+
+  void _showScheduleDetailPage(ScheduleModel schedule) {
+    Get.to(() => ScheduleDetailPage(
+          schedule: schedule,
+          exerciseController: exerciseController,
+        ));
   }
 
   @override
@@ -44,16 +57,23 @@ class _PatientHomePageState extends State<PatientHomePage> {
           separatorBuilder: (_, __) => const Divider(),
           itemBuilder: (context, index) {
             final schedule = scheduleController.schedules[index];
-            final formattedTime =
-                TimeOfDay.fromDateTime(schedule.scheduledTime).format(context);
-            final formattedDateTime =
-                '${schedule.scheduledTime.day}/${schedule.scheduledTime.month}/${schedule.scheduledTime.year} às $formattedTime';
+            final formattedDate =
+                DateFormat('dd/MM/yyyy – HH:mm').format(schedule.scheduledTime);
 
-            return ListTile(
-              title: Text('Agendamento em $formattedDateTime'),
-              subtitle: Text(
-                  'Duração: ${schedule.durationMinutes} min\nNotas: ${schedule.notes}'),
-              isThreeLine: true,
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ListTile(
+                title: Text('Agendamento em $formattedDate'),
+                subtitle: Text(
+                  'Duração: ${schedule.durationMinutes} min\nNotas: ${schedule.notes}',
+                ),
+                isThreeLine: true,
+                onTap: () => _showScheduleDetailPage(schedule),
+              ),
             );
           },
         );

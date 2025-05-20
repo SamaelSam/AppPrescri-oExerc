@@ -126,11 +126,12 @@ final List<GetPage> appPages = [
   ),
   GetPage(
     name: AppRoutes.patientHome,
-    page: () => PatientHomePage(),
+    page: () => const PatientHomePage(),
     bindings: [
       BindingsBuilder(() {
         Get.put(PatientController());
         Get.put(ScheduleController());
+        Get.put(ExerciseController());
       }),
     ],
     middlewares: [AuthMiddleware()],
