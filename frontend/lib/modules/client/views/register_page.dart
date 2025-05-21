@@ -46,12 +46,14 @@ class RegisterPage extends StatelessWidget {
               children: [
                 Text(
                   "Informações da Conta",
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: usernameController,
-                  decoration: customDecoration('Usuário *', 'Digite seu nome de usuário'),
+                  decoration: customDecoration(
+                      'Usuário *', 'Digite seu nome de usuário'),
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -68,12 +70,14 @@ class RegisterPage extends StatelessWidget {
                 const SizedBox(height: 32),
                 Text(
                   "Informações Pessoais",
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: nameController,
-                  decoration: customDecoration('Nome completo *', 'Digite seu nome completo'),
+                  decoration: customDecoration(
+                      'Nome completo *', 'Digite seu nome completo'),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -111,14 +115,18 @@ class RegisterPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 TextField(
                   controller: phoneController,
-                  decoration: customDecoration('Telefone *', 'Digite seu número'),
+                  decoration:
+                      customDecoration('Telefone *', 'Digite seu número'),
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () async {
@@ -127,13 +135,17 @@ class RegisterPage extends StatelessWidget {
                     final password = passwordController.text.trim();
                     final name = nameController.text.trim();
                     final age = int.tryParse(ageController.text.trim()) ?? 0;
-                    final weight = double.tryParse(weightController.text.trim()) ?? 0.0;
-                    final height = double.tryParse(heightController.text.trim()) ?? 0.0;
+                    final weight =
+                        double.tryParse(weightController.text.trim()) ?? 0.0;
+                    final height =
+                        double.tryParse(heightController.text.trim()) ?? 0.0;
                     final condition = conditionController.text.trim();
                     final phone = phoneController.text.trim();
 
-                    if ([username, email, password, name, phone].any((e) => e.isEmpty)) {
-                      Get.snackbar('Erro', 'Preencha todos os campos obrigatórios');
+                    if ([username, email, password, name, phone]
+                        .any((e) => e.isEmpty)) {
+                      Get.snackbar(
+                          'Erro', 'Preencha todos os campos obrigatórios');
                       return;
                     }
 
