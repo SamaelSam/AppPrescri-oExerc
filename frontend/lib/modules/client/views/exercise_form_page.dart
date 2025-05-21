@@ -29,10 +29,36 @@ class _ExerciseFormPageState extends State<ExerciseFormPage> {
     super.dispose();
   }
 
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    bool requiredField = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        validator: requiredField
+            ? (value) =>
+                value == null || value.isEmpty ? 'Campo obrigatório' : null
+            : null,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Novo Exercício')),
+      appBar: AppBar(
+        title: const Text('Novo Exercício'),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -40,56 +66,57 @@ class _ExerciseFormPageState extends State<ExerciseFormPage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Nome'),
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Campo obrigatório'
-                      : null,
-                ),
-                TextFormField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Descrição'),
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Campo obrigatório'
-                      : null,
-                ),
-                TextFormField(
-                  controller: videoUrlController,
-                  decoration: const InputDecoration(
-                      labelText: 'URL do vídeo (opcional)'),
-                ),
-                TextFormField(
-                  controller: difficultyController,
-                  decoration: const InputDecoration(
-                      labelText: 'Dificuldade (opcional)'),
-                ),
-                TextFormField(
-                  controller: categoryController,
-                  decoration:
-                      const InputDecoration(labelText: 'Categoria (opcional)'),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      controller.addExercise(
-                        name: nameController.text,
-                        description: descriptionController.text,
-                        videoUrl: videoUrlController.text.isNotEmpty
-                            ? videoUrlController.text
-                            : null,
-                        difficulty: difficultyController.text.isNotEmpty
-                            ? difficultyController.text
-                            : null,
-                        category: categoryController.text.isNotEmpty
-                            ? categoryController.text
-                            : null,
-                      );
-                      Get.back(result: true);
-                    }
-                  },
-                  child: const Text('Salvar'),
+                buildTextField(
+                    controller: nameController,
+                    label: 'Nome',
+                    requiredField: true),
+                buildTextField(
+                    controller: descriptionController,
+                    label: 'Descrição',
+                    requiredField: true),
+                buildTextField(
+                    controller: videoUrlController, label: 'URL do vídeo'),
+                buildTextField(
+                    controller: difficultyController, label: 'Dificuldade'),
+                buildTextField(
+                    controller: categoryController, label: 'Categoria'),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.save, color: Colors.white),
+                    label: const Text('Salvar'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        controller.addExercise(
+                          name: nameController.text,
+                          description: descriptionController.text,
+                          videoUrl: videoUrlController.text.isNotEmpty
+                              ? videoUrlController.text
+                              : null,
+                          difficulty: difficultyController.text.isNotEmpty
+                              ? difficultyController.text
+                              : null,
+                          category: categoryController.text.isNotEmpty
+                              ? categoryController.text
+                              : null,
+                        );
+                        Get.back(result: true);
+                      }
+                    },
+                  ),
                 ),
               ],
             ),

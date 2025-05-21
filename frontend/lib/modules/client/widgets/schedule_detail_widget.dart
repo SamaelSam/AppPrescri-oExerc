@@ -19,143 +19,219 @@ class ScheduleDetailWidget extends StatefulWidget {
 }
 
 class _ScheduleDetailWidgetState extends State<ScheduleDetailWidget> {
-  int currentExerciseIndex = 0;
-  YoutubePlayerController? _youtubeController;
+  final Map<String, YoutubePlayerController> _controllers = {};
 
-  @override
-  void initState() {
-    super.initState();
-    _initVideo();
-  }
-
-  void _initVideo() {
-    final exId = widget.schedule.exerciseIds[currentExerciseIndex];
-    final exercise = widget.exerciseController.exercises
-        .firstWhereOrNull((e) => e.id == exId);
-
-    if (exercise?.videoUrl != null) {
-      final videoId =
-          YoutubePlayerController.convertUrlToId(exercise!.videoUrl!);
-      if (videoId != null) {
-        final novoController = YoutubePlayerController.fromVideoId(
-          videoId: videoId,
-          params: const YoutubePlayerParams(
-            showControls: true,
-            showFullscreenButton: true,
-            enableJavaScript: true,
-            playsInline: true,
-          ),
-        );
-
-        _youtubeController?.close();
-        setState(() {
-          _youtubeController = novoController;
-        });
-        return;
-      }
-    }
-
-    _youtubeController?.close();
-    setState(() {
-      _youtubeController = null;
-    });
+  YoutubePlayerController _initYoutubeController(String url) {
+    final videoId = YoutubePlayerController.convertUrlToId(url);
+    return YoutubePlayerController.fromVideoId(
+      videoId: videoId ?? '',
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
+        enableJavaScript: true,
+        playsInline: true,
+      ),
+    );
   }
 
   @override
   void dispose() {
-    _youtubeController?.close();
+    for (var controller in _controllers.values) {
+      controller.close();
+    }
     super.dispose();
   }
 
   @override
-Widget build(BuildContext context) {
-  final exId = widget.schedule.exerciseIds[currentExerciseIndex];
-  final exercise = widget.exerciseController.exercises
-      .firstWhereOrNull((e) => e.id == exId);
+  Widget build(BuildContext context) {
+    final exercises = widget.schedule.exerciseIds
+        .map((id) => widget.exerciseController.exercises
+            .firstWhereOrNull((e) => e.id == id))
+        .where((e) => e != null)
+        .toList();
 
-  return SizedBox(
-    width: 400,
-    height: 500,
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          // BOTÃO DE VOLTAR
-          Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => Get.back(),
-            ),
-          ),
-
-          Text(
-            'Exercício ${currentExerciseIndex + 1} de ${widget.schedule.exerciseIds.length}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          if (exercise != null) ...[
-            Text(
-              exercise.name,
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 10),
-            if (_youtubeController != null)
-              SizedBox(
-                width: double.infinity,
-                height: 260,
-                child: YoutubePlayer(
-                  controller: _youtubeController!,
-                  aspectRatio: 16 / 9,
-                ),
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: exercises.length,
+      itemBuilder: (context, index) {
+        final exercise = exercises[index]!;
+        final controller = (exercise.videoUrl != null)
+            ? _controllers.putIfAbsent(
+                exercise.id!,
+                () => _initYoutubeController(exercise.videoUrl!),
               )
-            else
-              const Text(
-                'Vídeo não disponível para este exercício.',
-                style: TextStyle(color: Colors.grey),
-              ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Text(
-                  exercise.description,
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                onPressed: currentExerciseIndex > 0
-                    ? () {
-                        setState(() {
-                          currentExerciseIndex--;
-                          _initVideo();
-                        });
-                      }
-                    : null,
-                child: const Text('Anterior'),
-              ),
-              ElevatedButton(
-                onPressed: currentExerciseIndex <
-                        widget.schedule.exerciseIds.length - 1
-                    ? () {
-                        setState(() {
-                          currentExerciseIndex++;
-                          _initVideo();
-                        });
-                      }
-                    : null,
-                child: const Text('Próximo'),
-              ),
-            ],
+            : null;
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 24),
+          elevation: 6,
+          color: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
-      ),
-    ),
-  );
-}
+          shadowColor: Colors.black.withOpacity(0.1),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Cabeçalho
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    'Exercício ${index + 1} de ${exercises.length}',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  ),
+                  subtitle: Text(
+                    exercise.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                  ),
+                  leading: CircleAvatar(
+                    radius: 22,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    child: Text(
+                      '${index + 1}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Vídeo ou placeholder
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: controller != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: YoutubePlayer(controller: controller),
+                          ),
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.1),
+                            ),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.videocam_off,
+                                  size: 48,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.3),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Sem vídeo disponível',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.5),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Séries e Repetições
+                Row(
+                  children: [
+                    Icon(Icons.fitness_center,
+                        size: 20, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 10),
+                    Text(
+                      '3 séries de 10 repetições',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // Intervalo
+                Row(
+                  children: [
+                    Icon(Icons.timer,
+                        size: 20, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Intervalo de 30 segundos',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontStyle: FontStyle.italic,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Descrição
+                Text(
+                  'Descrição:',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  exercise.description,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

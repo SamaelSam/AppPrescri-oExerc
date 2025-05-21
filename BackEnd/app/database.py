@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from app.services.auth_service import create_user
 
+
 load_dotenv()
 
 MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://fabricio:fabricio99@reciclai.y2she.mongodb.net/")

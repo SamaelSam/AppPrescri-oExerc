@@ -1,10 +1,12 @@
 from bson import ObjectId
-from fastapi import HTTPException
+from fastapi import HTTPException, Query
 from app.database import get_collection
 from app.models.schedule import Schedule
+from typing import List
 
 collection = get_collection("fitness_app.schedules")
-
+patients_collection = get_collection("fitness_app.patients")
+schedules_collection = get_collection("fitness_app.schedules")
 
 async def create_schedule(schedule: Schedule) -> dict:
     """
@@ -36,6 +38,23 @@ async def get_schedule_by_id(schedule_id: str) -> dict:
         return schedule
     raise HTTPException(status_code=404, detail="Agendamento não encontrado")
 
+
+async def get_schedules_by_patient_email(email: str):
+    # Buscar paciente pelo e-mail
+    patient = await patients_collection.find_one({"email": email})
+    if not patient:
+        raise HTTPException(status_code=404, detail="Paciente não encontrado com esse e-mail.")
+
+    patient_id = str(patient["_id"])  # já está como string, mas garantimos isso aqui
+
+    # Buscar agendamentos com user_id == patient_id
+    cursor = schedules_collection.find({"user_id": patient_id})
+    schedules = []
+    async for schedule in cursor:
+        schedule["_id"] = str(schedule["_id"])
+        schedules.append(schedule)
+
+    return schedules
 
 async def delete_schedule(schedule_id: str) -> dict:
     """

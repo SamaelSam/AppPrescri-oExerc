@@ -3,17 +3,20 @@ import '../modules/client/views/login_page.dart';
 import '../modules/client/views/schedule_list_page.dart';
 import '../modules/client/views/schedule_form_page.dart';
 import '../modules/client/views/patient_form_page.dart';
-import '../modules/client/views/patient_list_page.dart'; // IMPORTAÇÃO JÁ ADICIONADA
+import '../modules/client/views/patient_list_page.dart'; 
 import '../modules/client/views/exercise_form_page.dart';
 import '../modules/client/views/exercise_list_page.dart';
 import '../modules/client/views/user_form_page.dart';
-import '../modules/client/views/user_list_page.dart'; // NOVA IMPORTAÇÃO
-import '../modules/client/views/home_page.dart'; // <--- Adicione esta linha
+import '../modules/client/views/user_list_page.dart'; 
+import '../modules/client/views/home_page.dart'; 
+import '../modules/client/views/register_page.dart'; 
 
 import '../modules/client/controllers/schedule_controller.dart';
 import '../modules/client/controllers/patient_controller.dart';
 import '../modules/client/controllers/exercise_controller.dart';
 import '../modules/client/controllers/user_controller.dart';
+import '../modules/client/views/patient_home_page.dart'; // 
+
 import '../middlewares/auth_middleware.dart';
 
 class AppRoutes {
@@ -27,6 +30,8 @@ class AppRoutes {
   static const userForm = '/users/new';
   static const userList = '/users';
   static const home = '/home';
+  static const patientHome = '/patient-home';
+  static const register = '/register';
 }
 
 final List<GetPage> appPages = [
@@ -48,7 +53,7 @@ final List<GetPage> appPages = [
   ),
   GetPage(
     name: AppRoutes.scheduleList,
-    page: () => ScheduleListPage(),
+    page: () => const ScheduleListPage(),
     bindings: [
       BindingsBuilder(() {
         Get.put(ScheduleController());
@@ -60,7 +65,7 @@ final List<GetPage> appPages = [
   ),
   GetPage(
     name: AppRoutes.scheduleForm,
-    page: () => ScheduleFormPage(),
+    page: () => const ScheduleFormPage(),
     bindings: [
       BindingsBuilder(() {
         Get.put(ScheduleController());
@@ -89,7 +94,7 @@ final List<GetPage> appPages = [
   ),
   GetPage(
     name: AppRoutes.exerciseForm,
-    page: () => ExerciseFormPage(),
+    page: () => const ExerciseFormPage(),
     binding: BindingsBuilder(() {
       Get.put(ExerciseController());
     }),
@@ -118,5 +123,21 @@ final List<GetPage> appPages = [
       Get.put(UserController());
     }),
     middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.patientHome,
+    page: () => const PatientHomePage(),
+    bindings: [
+      BindingsBuilder(() {
+        Get.put(PatientController());
+        Get.put(ScheduleController());
+        Get.put(ExerciseController());
+      }),
+    ],
+    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.register,
+    page: () => RegisterPage(),
   ),
 ];
